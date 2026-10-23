@@ -172,6 +172,7 @@ footer{padding:34px 0 46px;text-align:center;color:var(--soft);font-size:12px;li
   .desk-only{display:none}
   .top-actions .nav-btn{display:none}
   .bottom-nav{display:flex}
+  /* 顶栏在移动端直接隐藏：主导航已由底部固定 tab 栏承载，顶栏孤零品牌名无信息量 */
   .topbar{display:none}
   /* 跳转锚点时不再为吸顶顶栏预留空间 */
   .chapter,.study{scroll-margin-top:12px}
@@ -218,8 +219,8 @@ footer{padding:34px 0 46px;text-align:center;color:var(--soft);font-size:12px;li
   .sidebar .toc .d{grid-column:2;font-size:11px}
   .sidebar-foot{display:block;padding:10px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--soft);line-height:1.8}
   .topbar .brand{display:none}
-  .topbar .ctx-line{display:none !important}
 }
+/* 细滚动条 */
 .sidebar::-webkit-scrollbar{width:6px}
 .sidebar::-webkit-scrollbar-thumb{background:#d8cdb4;border-radius:3px}
 
@@ -533,7 +534,6 @@ body.paged.view-chapter .pager{display:flex}
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">冰鉴<small>共读</small></div>
-        <div class="ctx-line" id="ctxLine" style="display:none">冰鉴<span class="ctx-sep">·</span><span class="ctx-ch">第一篇 · 神骨</span></div>
         <div class="top-actions">
           <button class="btn ghost nav-btn act-home" id="homeBtn" title="回到首页 / 封面">首页</button>
           <button class="btn ghost nav-btn act-study" id="studyBtn" title="研读专区">研读</button>
@@ -1275,22 +1275,6 @@ function setNavActive(name, n){
     }
   }
 }
-/* 移动端顶栏上下文行：根据当前视图显示「冰鉴 · 第N篇 · 标题」或「冰鉴 · 研读」或隐藏（首页） */
-function updateCtxLine(name, n){
-  var ctx = document.getElementById('ctxLine');
-  if (!ctx) return;
-  var brand = '冰鉴';
-  if (name === 'ch' && n >= 1 && n <= TOTAL) {
-    var ch = CHAPTERS[n - 1] || {};
-    ctx.innerHTML = brand + '<span class="ctx-sep">·</span><span class="ctx-ch">第' + CN[n - 1] + '篇 · ' + (ch.label || '') + '</span>';
-    ctx.style.display = 'block';
-  } else if (name === 'study') {
-    ctx.innerHTML = brand + '<span class="ctx-sep">·</span><span class="ctx-ch">研读专区</span>';
-    ctx.style.display = 'block';
-  } else {
-    ctx.style.display = 'none';
-  }
-}
 function setView(name, n){
   var views = document.querySelectorAll('.view');
   for (var i = 0; i < views.length; i++) { views[i].classList.remove('active-view'); }
@@ -1307,7 +1291,6 @@ function setView(name, n){
     updatePager(n);
   }
   setNavActive(name, n);
-  updateCtxLine(name, n);
   try { window.scrollTo(0, 0); } catch (e2) {}
 }
 function updatePager(n){
