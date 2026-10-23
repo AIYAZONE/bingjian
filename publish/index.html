@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYjIzMDJiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOGExZjFmIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iMTIiIGZpbGw9InVybCgjZykiLz48cmVjdCB4PSI5IiB5PSI5IiB3aWR0aD0iNDYiIGhlaWdodD0iNDYiIHJ4PSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjU1IiBzdHJva2Utd2lkdGg9IjEuNSIvPjx0ZXh0IHg9IjMyIiB5PSI0NCIgZm9udC1zaXplPSIzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1mYW1pbHk9IlNUU29uZywgU2ltU3VuLCBzZXJpZiI+6Ym0PC90ZXh0Pjwvc3ZnPg==" />
+<meta name="theme-color" content="#2c5f7c" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>冰鉴 · 七天共读</title>
+<style>
+:root{
+  --paper:#f6f1e6; --card:#fffdf7; --ink:#2e2a22; --soft:#71695a;
+  --accent:#a02c2c; --accent-deep:#8a1f1f; --accent-bg:#f7e9e4; --line:#e4dac4;
+  --sidebar-w:300px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  background-image:radial-gradient(rgba(160,44,44,.03) 1px, transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink);
+  font-family:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+  font-size:17px;line-height:2;-webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit}
+.btn{font-size:14px;padding:6px 14px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:6px;cursor:pointer;line-height:1.6;transition:.15s}
+.btn:hover{background:var(--accent);color:#fff}
+.btn.ghost{border-color:var(--line);color:var(--soft)}
+.btn.ghost:hover{border-color:var(--soft);background:var(--soft);color:#fff}
+
+/* ========== 布局：窄屏（移动优先）——侧栏为抽屉 ========== */
+.layout{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:84%;max-width:340px;z-index:200;background:var(--paper);border-right:1px solid var(--line);transform:translateX(-100%);transition:transform .25s ease;box-shadow:2px 0 16px rgba(0,0,0,.14);overflow-y:auto;overscroll-behavior:contain}
+body.toc-open .sidebar{transform:none}
+#tocBackdrop{position:fixed;inset:0;background:rgba(46,42,34,.38);z-index:150;opacity:0;visibility:hidden;transition:opacity .2s}
+body.toc-open #tocBackdrop{opacity:1;visibility:visible}
+.sidebar-head{display:block;padding:15px 18px 12px;border-bottom:1px solid var(--line);background:var(--paper)}
+.sidebar-foot{display:block;padding:12px 18px 22px;border-top:1px solid var(--line);font-size:12px;color:var(--soft);line-height:1.9}
+.toc-details{border-top:none}
+.toc-details summary{display:none}
+.toc-details summary::-webkit-details-marker{display:none}
+.sidebar .toc{padding:6px 12px 18px}
+.toc ol{list-style:none;display:block;gap:8px}
+.toc li{margin-bottom:8px}
+.toc a{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--paper);border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);font-size:14px;transition:.15s}
+.toc a:hover{border-color:var(--accent);background:#fff}
+.toc a.active{border-color:var(--accent);background:var(--accent-bg)}
+.toc a.today .d::after{content:" · 今日";color:var(--accent);font-weight:600}
+.seal{flex:none;min-width:26px;height:26px;padding:0 5px;background:var(--accent);color:#fff;font-family:"STKaiti","KaiTi",serif;font-size:14px;display:flex;align-items:center;justify-content:center;border-radius:5px}
+.toc .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc .d{font-size:11px;color:var(--soft);white-space:nowrap}
+
+/* 顶栏 */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(246,241,230,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:780px;margin:0 auto;padding:0 18px;height:54px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:"STKaiti","KaiTi","Kaiti SC",serif;font-size:22px;letter-spacing:2px;white-space:nowrap;flex:none}
+.brand small{font-size:12px;letter-spacing:3px;color:var(--soft);margin-left:6px}
+.top-actions{display:flex;gap:8px;align-items:center;flex:1;min-width:0}
+.top-spacer{flex:1}
+/* 顶栏导航「当前页」选中态 */
+.nav-btn.active{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+
+/* ========== 底部导航（移动端 tab 栏） ========== */
+.bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:80;background:rgba(246,241,230,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+.bn-item{flex:1;border:none;background:transparent;color:var(--soft);font-size:14.5px;padding:8px 0 13px;cursor:pointer;line-height:1.35;font-family:inherit;text-align:center;position:relative;transition:color .15s}
+.bn-item.active{color:var(--accent);font-weight:700}
+.bn-item.active:after{content:"";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:28px;height:4px;border-radius:3px;background:var(--accent)}
+.bn-item:active{opacity:.6}
+
+.wrap{max-width:780px;margin:0 auto;padding:0 18px}
+
+.hero{text-align:center;padding:52px 0 8px}
+.hero h1{font-family:"STKaiti","KaiTi","Kaiti SC",serif;font-size:56px;letter-spacing:14px;text-indent:14px;font-weight:600}
+.hero .sub{margin-top:10px;color:var(--soft);font-size:13px;letter-spacing:2px}
+.hero .rule{width:64px;height:2px;background:var(--accent);margin:20px auto 0;opacity:.7}
+.intro{margin:26px 0 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:15px;color:#4a4438;text-align:justify}
+
+.plan{margin:26px 0;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:18px 20px}
+.plan-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.plan-head h2{font-size:18px;letter-spacing:2px;font-weight:600}
+.chip{background:var(--accent-bg);color:var(--accent-deep);border:1px solid #e8c9c2;font-size:13px;padding:3px 12px;border-radius:999px;white-space:nowrap}
+.plan-body{margin-top:12px}
+.today-line{font-size:20px;font-family:"STKaiti","KaiTi",serif;letter-spacing:1px}
+.progress{height:8px;background:#efe7d5;border-radius:999px;margin:14px 0;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#c05a4a,var(--accent));border-radius:999px;transition:width .4s}
+.plan-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--soft)}
+.plan-actions input{font-family:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.plan-actions .spacer{flex:1}
+.plan-actions .hint{font-size:12px;color:var(--soft)}
+.plan-date{font-size:13px;color:var(--ink)}
+.plan-date b{color:var(--accent-deep);font-weight:600}
+.tp-date{font-family:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.tp-anshen{font-family:"STKaiti","KaiTi",serif;font-size:16px;line-height:1.7;color:var(--ink);text-align:justify;background:linear-gradient(135deg,var(--accent-bg),#fdf3ee);border:1px solid #eccfc6;border-radius:10px;padding:10px 12px;margin:2px 0 4px}
+.noscript-tip{display:none;margin-top:10px;font-size:12px;color:var(--soft)}
+
+.chapter{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 26px 20px;margin:22px 0;scroll-margin-top:70px}
+.ch-head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px dashed var(--line);margin-bottom:16px}
+.seal-lg{min-width:40px;height:40px;padding:0 8px;font-size:20px;border-radius:8px}
+.ch-head h2{font-size:20px;letter-spacing:3px;font-weight:600;line-height:1.5}
+.ch-head .lab{font-size:13px;color:var(--soft);letter-spacing:1px;margin-top:2px}
+.ch-head .spacer{flex:1}
+.share-btn{flex:none;font-size:12px;padding:4px 10px}
+.ch-text p{text-align:justify;margin:0 0 4px}
+.ch-text p:last-child{margin-bottom:0}
+.ch-foot{margin-top:16px;text-align:right}
+.ch-foot a{font-size:12px;color:var(--soft);text-decoration:none;border-bottom:1px dotted var(--soft)}
+.det{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px}
+.det-label{font-size:12px;color:var(--soft);letter-spacing:3px;margin-bottom:10px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.tab-btn{font-size:13px;padding:6px 15px;border:1px solid var(--line);background:var(--paper);color:var(--soft);border-radius:999px;cursor:pointer;transition:.15s;line-height:1.5}
+.tab-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panels{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.panel{display:none}
+.panel.active{display:block;animation:fade .2s}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.panel p{text-align:justify;text-indent:2em;margin:0 0 14px;line-height:2;font-size:15.5px}
+.panel p:last-child{margin-bottom:0}
+.zhu{list-style:none;margin:0;padding:0}
+.zhu li{margin:0 0 10px;padding-left:1.4em;text-indent:-1.4em;line-height:1.9;font-size:15px}
+.zhu b{color:var(--accent-deep);font-weight:600;margin-right:4px}
+.jie{list-style:none;margin:0;padding:0}
+.jie li{margin:0 0 12px;padding-left:1.6em;text-indent:-1.6em;line-height:1.95;font-size:15px}
+.jie .src{display:inline-block;font-weight:600;color:var(--accent-deep);margin-right:7px;font-size:13px;letter-spacing:1px}
+.jiedu{display:flex;flex-direction:column;gap:2px}
+.jrow{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--line)}
+.jrow:last-child{border-bottom:none}
+.jlabel{flex:none;min-width:62px;text-align:center;background:var(--accent-bg);color:var(--accent-deep);border:1px solid #e8c9c2;font-size:12px;padding:3px 8px;border-radius:6px;line-height:1.4;font-weight:600;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none}
+.jlabel:after{content:"？";margin-left:3px;font-weight:400;opacity:.55}
+.jhint{margin:0 0 2px;font-size:12px;color:var(--soft);letter-spacing:.5px;text-indent:0}
+.jintro{display:none;margin:0 0 10px;font-size:13px;line-height:1.85;color:#4a4438;background:var(--accent-bg);border:1px dashed #e8c9c2;border-radius:8px;padding:9px 12px;text-align:justify}
+.jrow.jopen .jintro{display:block}
+.jrow.jopen .jlabel:after{content:"？";opacity:.3}
+.jrow p{margin:0;line-height:1.9;font-size:15px;text-align:justify;text-indent:2em}
+.nodata{color:var(--soft);font-size:13px}
+
+/* 注音 ruby + 通假虚线 */
+ruby{ruby-position:over}
+ruby rt{font-size:.58em;color:var(--accent-deep);font-family:"Songti SC","STSong",serif;user-select:none;line-height:1;font-weight:400}
+ruby.tj{border-bottom:1px dashed var(--accent);cursor:pointer}
+body.no-py ruby rt{display:none}
+.py-toggle.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.flash{animation:flash 1.8s}
+@keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--accent-bg)}100%{box-shadow:0 0 0 0 transparent}}
+
+.backtop{position:fixed;right:18px;bottom:22px;z-index:60;width:42px;height:42px;border-radius:50%;border:1px solid var(--accent);background:var(--card);color:var(--accent);font-size:15px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.backtop.show{display:flex}
+.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:70;background:rgba(46,42,34,.92);color:#fff;font-size:13px;padding:8px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+footer{padding:34px 0 46px;text-align:center;color:var(--soft);font-size:12px;line-height:2}
+
+@media (max-width:640px){
+  .toc ol{grid-template-columns:1fr}
+  .hero h1{font-size:44px;letter-spacing:10px;text-indent:10px}
+  .chapter{padding:20px 18px 16px}
+  body{font-size:16.5px}
+  .topbar-inner{height:50px;padding:0 12px;gap:8px}
+  .topbar .brand{font-size:19px;letter-spacing:1px}
+  .topbar .brand small{display:none}
+  .top-actions{gap:6px;justify-content:flex-end;flex:1;min-width:0}
+  .top-actions .btn{padding:6px 10px;font-size:13px;white-space:nowrap}
+  .tlong{display:none}
+  .study{padding:20px 16px 16px}
+  .pager{padding:10px 12px}
+  .pager .btn{padding:8px 12px}
+  .pager .pager-info{font-size:12px;letter-spacing:0;line-height:1.6}
+  .pager .plabel{display:none}
+}
+/* 窄屏（含平板）：顶栏导航（首页/研读/今日/目录）移到底部 tab 栏，顶栏只留设置按钮；底部导航常驻 */
+@media (max-width:1023px){
+  .desk-only{display:none}
+  .top-actions .nav-btn{display:none}
+  .bottom-nav{display:flex}
+  /* 顶栏在移动端不吸顶：随正文滚动消失，最大化正文可视面积；主导航已由底部固定 tab 栏承载 */
+  .topbar{position:static;backdrop-filter:none;border-bottom:none}
+  /* 跳转锚点时不再为吸顶顶栏预留空间 */
+  .chapter,.study{scroll-margin-top:12px}
+  /* 目录抽屉：章号 / 标题 / 共读日期 两行展示，日期常显 */
+  .sidebar .toc a{display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:3px;align-items:center;padding:11px 14px;margin-bottom:4px}
+  .sidebar .toc .seal{grid-row:span 2}
+  .sidebar .toc .t{grid-column:2;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sidebar .toc .d{grid-column:2;font-size:11px;color:var(--soft);white-space:nowrap}
+  .content{padding-bottom:82px}
+  .backtop{bottom:92px}
+  /* 移动端顶栏仅作品牌条，工具入口统一走底部导航，避免与底栏重复 */
+  #toolsBtn{display:none}
+}
+
+/* 目录已读进度标记 */
+.toc a.read .seal{background:#b3a48e}
+.toc a.read .t{color:#7a7263}
+
+/* ========== 宽屏：左侧目录栏 + 右侧正文（PDF 阅读器式） ========== */
+@media (min-width:1024px){
+  .layout{display:flex;align-items:flex-start;max-width:1320px;margin:0 auto}
+  /* 内容列必须撑满剩余宽度：flex 项默认按内容收缩，短章节会把整列拉窄 */
+  .content{flex:1 1 auto;min-width:0}
+  .wrap{max-width:920px}
+  .topbar-inner{max-width:920px}
+  .plan{position:sticky;top:60px;z-index:5}
+  .sidebar{
+    flex:0 0 var(--sidebar-w);width:var(--sidebar-w);
+    position:sticky;top:0;height:100vh;
+    transform:none; /* 宽屏为常驻左栏，必须撤销移动端抽屉的 off-screen 位移 */
+    overflow-y:auto;overscroll-behavior:contain;
+    border-bottom:none;border-right:1px solid var(--line);
+  }
+  .sidebar-head{display:block;position:sticky;top:0;z-index:2;background:var(--card);padding:14px 18px 12px;border-bottom:1px solid var(--line)}
+  .sidebar-head .brand{font-size:22px}
+  .sidebar-sub{margin-top:4px;font-size:12px;color:var(--soft);letter-spacing:2px}
+  .toc-details{border-top:none;display:block}
+  .toc-details summary{display:none}
+  .sidebar .toc{padding:10px 12px 16px}
+  .sidebar .toc ol{display:block}
+  .sidebar .toc a{display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:0;align-items:center;padding:8px 10px;margin-bottom:2px}
+  .sidebar .toc .seal{grid-row:span 2}
+  .sidebar .toc .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+  .sidebar .toc .d{grid-column:2;font-size:11px}
+  .sidebar-foot{display:block;padding:10px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--soft);line-height:1.8}
+  .topbar .brand{display:none}
+}
+/* 细滚动条 */
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:#d8cdb4;border-radius:3px}
+
+@media print{
+  .sidebar,.topbar,.backtop,.plan-actions,.share-btn,.ch-foot,.det,.pager{display:none}
+  .layout{display:block}
+  body{background:#fff}
+  .chapter,.plan,.intro{break-inside:avoid-page;border-color:#ccc}
+  .study,.study-nav{display:none}
+  body.paged .view{display:block !important}
+  body.paged .view.active-view{display:block !important}
+}
+
+/* ========== 研读 hub ========== */
+.study{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px 26px 22px;margin:22px 0;scroll-margin-top:70px}
+.study-head{text-align:center;margin-bottom:18px}
+.study-head h2{font-family:"STKaiti","KaiTi",serif;font-size:28px;letter-spacing:10px;text-indent:10px;font-weight:600}
+.study-sub{margin-top:8px;color:var(--soft);font-size:13px;letter-spacing:1px}
+.study-block{margin-top:22px}
+.blk-title{font-size:17px;letter-spacing:2px;font-weight:600;border-left:4px solid var(--accent);padding-left:10px;margin-bottom:14px}
+.smap{display:flex;flex-direction:column}
+.snode{display:flex;gap:14px;padding-bottom:16px;position:relative}
+.snode:last-child{padding-bottom:0}
+.snum{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-family:"STKaiti",serif;font-size:15px;display:flex;align-items:center;justify-content:center}
+.sbody{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.sname{font-size:16px;font-weight:600;letter-spacing:1px}
+.srange{font-size:12px;color:var(--accent-deep);background:var(--accent-bg);border:1px solid #e8c9c2;padding:1px 8px;border-radius:999px;margin-left:8px;white-space:nowrap}
+.sdesc{font-size:14.5px;line-height:1.95;color:#4a4438;text-align:justify;margin-top:6px}
+.skey{font-size:13px;color:var(--soft);margin-top:6px;line-height:1.8}
+.skey b{color:var(--accent-deep)}
+.cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.concept{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.cterm{font-size:16px;font-weight:600;font-family:"STKaiti","KaiTi",serif;letter-spacing:1px}
+.cpy{font-size:12px;color:var(--accent-deep);font-family:"Songti SC",serif;margin-left:6px;font-weight:400}
+.cdef{font-size:14px;line-height:1.85;color:#4a4438;text-align:justify;margin-top:5px}
+.cchap{font-size:12px;color:var(--soft);margin-top:7px}
+.citem{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);font-size:12px;margin-right:4px}
+.citem:hover{background:var(--accent-bg)}
+.qlist{list-style:none;margin:0;padding:0;columns:2;column-gap:24px}
+.qlist li{break-inside:avoid;margin-bottom:12px;font-size:15px;line-height:1.9;color:var(--ink);font-family:"STKaiti","KaiTi",serif}
+.qtext{color:var(--ink)}
+.qchap{font-size:12px;color:var(--soft);text-decoration:none;font-family:"Songti SC",serif}
+.qchap:hover{color:var(--accent);border-bottom:1px dotted var(--accent)}
+.study-nav{display:block;margin:10px 14px 4px;padding:9px 12px;background:var(--accent-bg);border:1px solid #e8c9c2;color:var(--accent-deep);text-decoration:none;border-radius:8px;font-size:13px;letter-spacing:1px;text-align:center}
+.study-nav:hover{background:#f2ddd6}
+
+/* 逐句对照（译文标签） */
+.sentences{display:flex;flex-direction:column}
+.srow{padding:10px 0;border-bottom:1px dashed var(--line)}
+.srow:last-child{border-bottom:none}
+.srow .src{font-size:16px;line-height:1.9;color:var(--ink);margin-bottom:4px}
+.srow .src ruby{font-weight:600}
+.srow .tr{font-size:14.5px;line-height:1.9;color:#4a4438;text-align:justify;text-indent:2em}
+
+/* ========== 分页阅读 ========== */
+.pager{display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin:24px 0 8px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.pager-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.pager .pager-info{flex:1;min-width:0;font-size:15px;font-family:"STKaiti","KaiTi",serif;letter-spacing:1px;color:var(--ink);text-align:center}
+.pager .btn{padding:8px 18px}
+.pager .btn:disabled{opacity:.4;cursor:not-allowed;border-color:var(--line);color:var(--soft);background:transparent}
+.cover{ }
+/* 分页：默认只显示当前视图，其余隐藏（无 JS 时 body 无 .paged，全部照常显示 = 连续单页） */
+body.paged .view{display:none}
+body.paged .view.active-view{display:block;animation:fade .25s}
+body.paged.view-chapter .pager{display:flex}
+@media (min-width:1024px){
+  body.paged .chapter.active-view{max-width:920px;margin-left:auto;margin-right:auto}
+}
+
+/* ========== 省察提问（章末） ========== */
+.sheng{margin:0;padding:0;list-style:none;counter-reset:sheng}
+.sheng li{position:relative;padding:10px 12px 10px 40px;margin:0 0 10px;background:var(--card);border:1px solid var(--line);border-radius:10px;line-height:1.85;color:var(--ink)}
+.sheng li:before{counter-increment:sheng;content:"省"counter(sheng);position:absolute;left:10px;top:10px;width:24px;height:24px;line-height:24px;text-align:center;font-size:12px;font-family:"STKaiti","KaiTi",serif;color:#fff;background:var(--accent);border-radius:50%}
+.sheng li:last-child{margin-bottom:0}
+
+/* ========== 参考书目 ========== */
+.bib{margin:0;padding:0;list-style:none}
+.bib li{padding:12px 14px;margin:0 0 12px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px}
+.bib .bname{display:block;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:4px;font-family:"STKaiti","KaiTi",serif}
+.bib li p{margin:0;font-size:14px;line-height:1.75;color:#4a4438;text-align:justify}
+
+/* ========== 人物小传 ========== */
+.figrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.fig{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.fig .fname{font-size:16px;font-weight:600;color:var(--ink);font-family:"STKaiti","KaiTi",serif}
+.fig .ftitle{font-size:13px;color:var(--accent);margin:2px 0 8px;font-weight:600}
+.fig p{margin:0;font-size:13.5px;line-height:1.7;color:#4a4438;text-align:justify}
+
+/* ========== 章间呼应表 ========== */
+.ech-wrap{overflow-x:auto}
+.ech{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+.ech caption{caption-side:top;text-align:left;font-size:13px;color:var(--soft);padding:0 0 8px}
+.ech th,.ech td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;line-height:1.6}
+.ech th{background:#f3ece0;color:var(--ink);font-weight:600;font-family:"STKaiti","KaiTi",serif;white-space:nowrap}
+.ech td.ck{white-space:nowrap;color:var(--accent);font-weight:600}
+.ech .citem{color:var(--accent);font-weight:600;text-decoration:none}
+.ech .citem:hover{text-decoration:underline}
+.ech .desc{color:#4a4438}
+
+@media (max-width:640px){
+  .ech{font-size:12.5px}
+  .ech th,.ech td{padding:6px 7px}
+}
+
+/* ========== 朱注（朱熹章句摘录，章末标签） ========== */
+.zz{margin:0;text-align:justify;text-indent:2em;line-height:2;font-size:15.5px;color:#3a342a}
+.zz:before{content:"朱子曰：";color:var(--accent-deep);font-weight:600}
+
+/* ========== 四书互参 ========== */
+.ssgrid{display:grid;grid-template-columns:1fr;gap:14px}
+.sscard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.sshead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.sszh{font-family:"STKaiti","KaiTi",serif;font-size:15px;font-weight:600;color:var(--accent)}
+.sstheme{font-size:13px;color:var(--soft)}
+.ssrefs{margin:0;padding:0;list-style:none}
+.ssrefs li{margin:0 0 10px;padding:8px 10px;background:var(--paper);border:1px solid var(--line);border-radius:8px;line-height:1.7}
+.ssrefs li:last-child{margin-bottom:0}
+.sbook{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:var(--accent-deep);border-radius:5px;padding:1px 8px;margin-right:8px;vertical-align:middle}
+.spass{display:block;font-size:14.5px;color:var(--ink);font-family:"STKaiti","KaiTi",serif;margin:2px 0 3px}
+.snote{display:block;font-size:13px;color:#4a4438;text-align:justify}
+
+/* ========== 经证链（串讲内，以经典解经典） ========== */
+.jzchain{margin-top:14px;border:1px dashed var(--accent);border-radius:10px;background:var(--accent-bg);padding:10px 14px}
+.jzhead{font-size:13px;font-weight:600;color:var(--accent-deep);letter-spacing:1px;margin-bottom:8px}
+.jzlist{margin:0;padding:0;list-style:none}
+.jzlist li{margin:0 0 8px;line-height:1.65}
+.jzlist li:last-child{margin-bottom:0}
+.jzbook{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:var(--accent-deep);border-radius:5px;padding:1px 8px;margin-right:8px;vertical-align:middle}
+.jzpass{display:block;font-size:14.5px;color:var(--ink);font-family:"STKaiti","KaiTi",serif;margin:2px 0 3px}
+.jznote{display:block;font-size:13px;color:#4a4438;text-align:justify}
+
+/* ========== 解读：所本经典（小字置于正文首行，随文换行） ========== */
+.jbody{flex:1;min-width:0}
+.jbasis{display:block;font-size:12px;color:var(--accent-deep);opacity:.75;letter-spacing:.5px;line-height:1.6;margin-bottom:4px}
+.jbasis:before{content:"";display:inline-block;width:14px;height:1px;background:var(--accent);vertical-align:middle;margin-right:7px;opacity:.6}
+
+/* ========== 朱注：章首句引标 ========== */
+.zz-head{font-size:13px;color:var(--soft);margin-bottom:6px;line-height:1.7}
+.zz-ref{color:var(--accent-deep);font-family:"STKaiti","KaiTi",serif}
+
+/* ========== 概念词典：经典互见 ========== */
+.occ{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+.occ-head{font-size:12px;font-weight:600;color:var(--accent-deep);letter-spacing:1px;margin-bottom:5px}
+.occlist{margin:0;padding:0;list-style:none}
+.occlist li{margin:0 0 6px;line-height:1.6}
+.osent{display:block;font-size:13px;color:#4a4438;text-align:justify;font-family:"STKaiti","KaiTi",serif;margin-top:1px}
+
+/* ========== 名句：语境还原 ========== */
+.qctx{font-size:12.5px;color:var(--soft);line-height:1.7;text-align:justify;margin-top:4px;padding-left:10px;border-left:2px solid var(--line)}
+
+/* ========== 义理脊柱 ========== */
+.spine{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.spnode{display:flex;gap:12px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.spname{flex:none;font-size:15px;font-weight:700;color:#fff;background:var(--accent);border-radius:8px;padding:5px 12px;font-family:"STKaiti","KaiTi",serif;white-space:nowrap;line-height:1.5}
+.sprange{font-size:12px;color:var(--accent-deep);background:var(--accent-bg);border:1px solid #e8c9c2;border-radius:999px;padding:2px 10px;white-space:nowrap;align-self:center;margin-left:auto}
+.spdesc{font-size:14px;line-height:1.85;color:#4a4438;text-align:justify;margin:0;flex:1;min-width:0}
+.seg{display:inline-block;font-size:11px;font-weight:600;color:#fff!important;background:var(--accent-deep);border-radius:5px;padding:2px 8px;margin-right:6px;vertical-align:middle}
+
+/* ========== 四书互参：逐章索引 ========== */
+.ssidx{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.ssidx-head{font-size:13px;font-weight:600;color:var(--accent-deep);letter-spacing:1px;margin-bottom:6px}
+.ssidxlist{margin:0;padding:0;list-style:none;columns:2;column-gap:20px}
+.ssidxlist li{break-inside:avoid;margin:0 0 5px;font-size:13.5px;line-height:1.6}
+.idxch{font-weight:600;color:var(--accent);margin-right:6px;font-family:"STKaiti","KaiTi",serif}
+
+/* ========== 以经解经专题 ========== */
+.topicgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.topic{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tname{font-size:17px;font-weight:700;color:var(--accent-deep);font-family:"STKaiti","KaiTi",serif;letter-spacing:1px;border-bottom:2px solid var(--accent);display:inline-block;padding-bottom:3px;margin-bottom:8px}
+.tdesc{font-size:13.5px;line-height:1.8;color:#4a4438;text-align:justify;margin:0 0 10px}
+.tlist{margin:0;padding:0;list-style:none}
+.tlist li{margin:0 0 9px;padding:7px 10px;background:var(--paper);border:1px solid var(--line);border-radius:8px;line-height:1.6}
+.tlist li:last-child{margin-bottom:0}
+.tsent{display:block;font-size:14px;color:var(--ink);font-family:"STKaiti","KaiTi",serif;margin:2px 0 3px}
+.tnote{display:block;font-size:12.5px;color:#4a4438;text-align:justify}
+
+/* ========== 引用与出处说明 ========== */
+.citebox{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.citebox p{margin:0 0 8px;font-size:14px;line-height:1.9;color:#4a4438;text-align:justify;text-indent:0}
+.citebox p:last-child{margin-bottom:0}
+.citebox ul{margin:0 0 8px;padding-left:20px}
+.citebox li{font-size:13.5px;line-height:1.9;color:#4a4438;margin-bottom:6px;text-align:justify}
+.citebox li:last-child{margin-bottom:0}
+
+/* ========== 我的践行笔记（省察面板） ========== */
+.sheng-wrap{margin:0}
+.sheng-note-box{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.sheng-lab{display:block;font-size:13px;color:var(--accent-deep);font-weight:600;letter-spacing:.5px;margin-bottom:6px}
+.sheng-count{display:inline-block;min-width:18px;color:var(--soft);font-weight:400}
+.sheng-note{width:100%;box-sizing:border-box;font:inherit;font-size:14.5px;line-height:1.8;color:var(--ink);
+  background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;min-height:64px}
+.sheng-note:focus{outline:none;border-color:var(--accent)}
+
+/* ========== 今日安心签 ========== */
+.anshen-card{margin-top:14px;background:linear-gradient(135deg,var(--accent-bg),#fdf3ee);border:1px solid #eccfc6;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.anshen-label{font-size:12px;letter-spacing:2px;color:var(--accent-deep);font-weight:600}
+.anshen-text{font-family:"STKaiti","KaiTi",serif;font-size:19px;line-height:1.7;color:var(--ink);text-align:justify}
+.anshen-share{margin-top:2px}
+
+/* ========== 冰鉴与当代焦虑 ========== */
+.mxgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.mxcard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.mxhead{margin-bottom:8px}
+.mxseg{display:inline-block;font-size:13px;font-weight:700;color:#fff;background:var(--accent);border-radius:6px;padding:2px 10px;font-family:"STKaiti","KaiTi",serif}
+.mxstress{margin:0 0 7px;font-size:13.5px;line-height:1.8;color:#4a4438;text-align:justify}
+.mxstress b{color:var(--accent-deep)}
+.mxremedy{margin:0 0 9px;font-size:14px;line-height:1.9;color:var(--ink);text-align:justify}
+.mxquote{margin:0;padding:8px 12px;border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:0 8px 8px 0;
+  font-family:"STKaiti","KaiTi",serif;font-size:14.5px;color:var(--accent-deep);line-height:1.7}
+.study-foot{margin-top:18px;text-align:center}
+.study-foot .hint{margin-left:10px;font-size:12px;color:var(--soft)}
+
+/* ========== 工具箱面板（统一收纳系统功能） ========== */
+.tools-mask{position:fixed;inset:0;background:rgba(40,32,18,.4);z-index:300;display:none}
+.tools-mask.open{display:block}
+.tools-panel{position:fixed;z-index:310;background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.18);
+  left:0;right:0;bottom:0;max-width:520px;margin:0 auto;padding:0 16px calc(16px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:6px;
+  max-height:calc(100vh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tools-panel.open{display:flex}
+.tp-head{position:sticky;top:0;z-index:2;background:var(--card);display:flex;align-items:center;justify-content:space-between;padding:13px 2px 10px;border-bottom:1px solid var(--line);font-family:"STKaiti","KaiTi",serif;font-size:18px;color:var(--accent-deep);letter-spacing:2px}
+.tp-close{flex:none;width:34px;height:34px;margin:-4px -6px 0 0;background:none;border:0;font-size:24px;color:var(--soft);cursor:pointer;line-height:1;border-radius:50%}
+.tp-close:active{background:var(--accent-bg)}
+.tp-sec{margin-top:6px}
+.tp-sec-t{font-size:13px;font-weight:700;color:var(--ink);margin:8px 0 6px;letter-spacing:.5px}
+.tp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;font-size:14.5px;color:var(--ink)}
+.tp-row .hint{font-size:12px;color:var(--soft)}
+.tp-status{font-size:13px;color:var(--soft);padding:2px 0 6px}
+.tp-status.ok{color:var(--accent-deep)}
+.tp-note{font-size:12px;color:var(--soft);line-height:1.6;margin-top:8px}
+.btn.block{display:block;width:100%;margin-top:8px;text-align:center}
+.btn:disabled, .btn.block:disabled{opacity:.5;cursor:not-allowed;background:#efe7d5;color:var(--soft);border-color:var(--line)}
+.btn.block:disabled:hover{background:#efe7d5}
+/* PC（≥1024px）：工具箱改为右上角下拉面板 */
+@media (min-width:1024px){
+  .tools-panel{left:auto;right:14px;bottom:auto;top:64px;width:300px;max-width:300px;margin:0;border-radius:16px;box-shadow:0 10px 36px rgba(0,0,0,.18)}
+}
+/* 践行笔记：纯本机存储，无需登录 */
+
+/* ========== 响应式收尾（必须位于基础规则之后，否则同优先级会被覆盖） ========== */
+/* 研读页双栏内容：小于 880px 一律单列（覆盖手机 / 平板 / 分屏预览等中间宽度） */
+@media (max-width:880px){
+  .cgrid{grid-template-columns:1fr}
+  .qlist{columns:1}
+  .figrid{grid-template-columns:1fr}
+  .ssidxlist{columns:1}
+  .topicgrid{grid-template-columns:1fr}
+  .mxgrid{grid-template-columns:1fr}
+  /* 义理脊柱卡片：移动端纵向堆叠 + 名称/范围同行 */
+  .spnode{flex-direction:column;gap:8px;padding:12px 14px}
+  .spname{align-self:flex-start;margin:0}
+  .sprange{align-self:flex-start;margin-left:0}
+  .spdesc{border-top:1px dashed var(--line);padding-top:8px}
+  /* 呼应表：让表格在小屏下可横向滚动而非直接转卡片（保留表格可读性） */
+  .ech{font-size:13px}
+  .ech th,.ech td{padding:7px 8px}
+}
+/* 解读面板：窄屏改为上下堆叠，学派名在上方，不再让左侧标签列挤占正文宽度 */
+@media (max-width:640px){
+  .jrow{flex-direction:column;gap:6px;padding:12px 0}
+  .jlabel{align-self:flex-start;min-width:0;padding:4px 10px;font-size:12.5px}
+  .jrow p{font-size:14.5px;line-height:1.85}
+  .jintro{margin-bottom:8px}
+  /* 章间呼应表：640px 以下转卡片布局 */
+  .ech thead{display:none}
+  .ech tbody,.ech tr,.ech td{display:block}
+  .ech tr{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px;background:var(--paper)}
+  .ech td{border:none;padding:3px 0;line-height:1.65;color:#3a3428}
+  .ech td:first-child{font-weight:700;color:var(--accent-deep);font-size:15px;font-family:"STKaiti","KaiTi",serif;margin-bottom:2px}
+  .ech td:before{display:inline-block;font-weight:600;font-size:11px;color:var(--soft);margin-right:5px;min-width:30px}
+  .ech td:nth-child(2):before{content:"主旨: "}
+  .ech td:nth-child(3):before{content:"呼应: "}
+  .ech td:nth-child(4):before{content:"说明: "}
+  /* 链接在卡片中用深色保证可读 */
+  .ech .citem{font-size:13px;color:var(--accent-deep);font-weight:600;border-bottom:none}
+  /* seg 徽章在卡片中保持深底白字 */
+  .ech .seg{display:inline-block;font-size:11px;font-weight:600;color:#fff!important;background:var(--accent-deep);border-radius:5px;padding:1px 7px;margin-right:6px;vertical-align:middle}
+}
+/* PC（≥1024px）左侧常驻目录栏，顶栏不再显示「目录」按钮（移动端保留，用于开抽屉） */
+@media (min-width:1024px){
+  .topbar .desk-hide{display:none}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">冰鉴<small>共读</small></div>
+      <div class="sidebar-sub">目 录 · 七章</div>
+    </div>
+    <a href="#study" class="study-nav">研读 · 脉络 / 概念 / 名句</a>
+    <details class="toc-details" id="tocDetails" open>
+      <summary>目 录 · 七章</summary>
+      <nav class="toc" id="toc">
+        <ol id="tocList">
+      <li><a href="#ch-1" data-n="1"><span class="seal">一</span><span class="t">神骨</span><span class="d">第1天 · 10月23日</span></a></li>
+      <li><a href="#ch-2" data-n="2"><span class="seal">二</span><span class="t">刚柔</span><span class="d">第2天 · 10月24日</span></a></li>
+      <li><a href="#ch-3" data-n="3"><span class="seal">三</span><span class="t">容貌</span><span class="d">第3天 · 10月25日</span></a></li>
+      <li><a href="#ch-4" data-n="4"><span class="seal">四</span><span class="t">情态</span><span class="d">第4天 · 10月26日</span></a></li>
+      <li><a href="#ch-5" data-n="5"><span class="seal">五</span><span class="t">须眉</span><span class="d">第5天 · 10月27日</span></a></li>
+      <li><a href="#ch-6" data-n="6"><span class="seal">六</span><span class="t">声音</span><span class="d">第6天 · 10月28日</span></a></li>
+      <li><a href="#ch-7" data-n="7"><span class="seal">七</span><span class="t">气色</span><span class="d">第7天 · 10月29日</span></a></li>
+        </ol>
+      </nav>
+    </details>
+    <div class="sidebar-foot">一天一篇 · 七天<br>文本依据：维基文库《冰鉴》<br>虚线标注的字为通假／异读，点按可看说明</div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">冰鉴<small>共读</small></div>
+        <div class="top-actions">
+          <button class="btn ghost nav-btn act-home" id="homeBtn" title="回到首页 / 封面">首页</button>
+          <button class="btn ghost nav-btn act-study" id="studyBtn" title="研读专区">研读</button>
+          <button class="btn nav-btn act-today" id="todayBtn" title="跳到今日共读章节">今日<span class="tlong">共读</span></button>
+          <button class="btn ghost nav-btn act-toc desk-hide" id="tocBtn">目录</button>
+          <span class="top-spacer"></span>
+          <button class="btn ghost" id="toolsBtn" title="工具箱：阅读设置 / 共读设置 / 分享">工具箱</button>
+        </div>
+      </div>
+
+    </header>
+
+    <div class="tools-mask" id="toolsMask"></div>
+    <div class="tools-panel" id="toolsPanel" role="dialog" aria-label="工具箱">
+      <div class="tp-head"><span>工具箱</span><button class="tp-close" id="toolsClose" type="button" aria-label="关闭">×</button></div>
+
+      <div class="tp-sec">
+        <div class="tp-sec-t">我的践行笔记</div>
+        <button class="btn block" id="exportSheng" type="button">导出我的 7 天自省</button>
+        <div class="tp-note">笔记与导出都只保存在当前浏览器，不会上传云端。清除缓存、更换设备或浏览器后将不可见，建议定期导出备份。</div>
+        <div class="tp-note" id="exportTip"></div>
+      </div>
+
+      <div class="tp-sec">
+        <div class="tp-sec-t">阅读设置</div>
+        <div class="tp-row"><span>疑难字注音</span><button class="btn ghost on py-toggle" id="pyBtn" type="button">开</button></div>
+        <div class="tp-row"><span id="modeState">分页阅读</span><button class="btn ghost mode-toggle" id="modeBtn" type="button">切换为连续阅读</button></div>
+      </div>
+
+      <div class="tp-sec">
+        <div class="tp-sec-t">共读设置</div>
+        <div class="tp-row"><span>开始日期</span><input type="date" id="startDate" class="tp-date"></div>
+        <div class="tp-note">改日期自动跳到对应章节</div>
+      </div>
+
+      <div class="tp-sec">
+        <div class="tp-sec-t">今日安心签</div>
+        <div class="tp-anshen" id="tpAnshenText"></div>
+        <button class="btn block ghost" id="shareAnshen" type="button">分享这句</button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <section class="cover view" data-view="cover" id="cover">
+      <section class="hero">
+        <h1>冰鉴</h1>
+        <p class="sub">旧题 清·曾国藩 撰 · 相人识人七大端</p>
+        <div class="rule"></div>
+        <p class="intro">《冰鉴》旧题曾国藩撰，共七篇，依次为神骨、刚柔、容貌、情态、须眉、声音、气色。全书以「一身精神具乎两目，一身骨相具乎面部」开篇，从静态的骨相到动态的情态，从先天的刚柔五行到后天的气色变化，构建了一套由内而外、由静而动、由本而末的观人体系。七篇虽短，义理精微，是中国传统相人术的纲领之作，也是曾国藩一生阅人无数的经验总结。</p>
+      </section>
+
+      <section class="plan">
+        <div class="plan-head">
+          <h2>今日共读</h2>
+          <span class="chip" id="dayChip">第 1 / 33 天</span>
+        </div>
+        <div class="plan-body">
+          <p class="today-line" id="todayLine">第一章 · 天命之谓性</p>
+          <div class="progress"><i id="progressBar"></i></div>
+          <div class="plan-actions">
+            <span class="plan-date">开始日期：<b id="planDateLabel"></b></span>
+            <span class="hint">在「工具箱 · 共读设置」中修改</span>
+            <span class="spacer"></span>
+            <button class="btn" id="resumeBtn" hidden>继续阅读</button>
+            <button class="btn" id="jumpBtn">跳到本章</button>
+          </div>
+          <div class="anshen-card" id="anshenCard">
+            <div class="anshen-label">今日安心签</div>
+            <div class="anshen-text" id="anshenText"></div>
+            <button class="btn ghost anshen-share" id="anshenShare" type="button">分享这句</button>
+          </div>
+          <noscript><p class="noscript-tip" style="display:block">当前环境未启用脚本：目录跳转与全文阅读可正常使用，「今日共读」定位与「分享本章」链接不可用。</p></noscript>
+        </div>
+      </section>
+      </section>
+
+  <section class="study view" id="study" data-view="study">
+    <div class="study-head"><h2>研 读</h2>
+      <p class="study-sub">结构脉络 · 核心概念 · 名句摘录 · 省察与呼应 · 经典互参 · 以经解经专题——先立其大，再入章句</p></div>
+    <div class="study-block">
+      <h3 class="blk-title">一、全书结构脉络</h3>
+      <div class="smap"><div class="snode"><div class="snum">1</div><div class="sbody"><div class="sname">一、神骨 <span class="srange">第1篇</span></div><p class="sdesc">一身精神具乎两目，一身骨相具乎面部——全书总纲，开门见山。</p><p class="skey"><b>重点：</b>神骨为先</p></div></div><div class="snode"><div class="snum">2</div><div class="sbody"><div class="sname">二、刚柔 <span class="srange">第2篇</span></div><p class="sdesc">五行生克之外刚柔，喜怒伏跳深浅之内刚柔——先天禀赋与内在性格。</p><p class="skey"><b>重点：</b>不足用补</p></div></div><div class="snode"><div class="snum">3</div><div class="sbody"><div class="sname">三、容貌 <span class="srange">第3篇</span></div><p class="sdesc">容以七尺为期，貌合两仪而论——整体比例与局部贵征。</p><p class="skey"><b>重点：</b>相顾相称</p></div></div><div class="snode"><div class="snum">4</div><div class="sbody"><div class="sname">四、情态 <span class="srange">第4篇</span></div><p class="sdesc">容貌者骨之余，情态者神之余——动态举止中的清浊取舍。</p><p class="skey"><b>重点：</b>有态有度</p></div></div><div class="snode"><div class="snum">5</div><div class="sbody"><div class="sname">五、须眉 <span class="srange">第5篇</span></div><p class="sdesc">眉主早成，须主晚运——须眉光彩与相称之理。</p><p class="skey"><b>重点：</b>眉尚彩</p></div></div><div class="snode"><div class="snum">6</div><div class="sbody"><div class="sname">六、声音 <span class="srange">第6篇</span></div><p class="sdesc">声主张，音主敛——闻声相思，其人斯在。</p><p class="skey"><b>重点：</b>轻清为上</p></div></div><div class="snode"><div class="snum">7</div><div class="sbody"><div class="sname">七、气色 <span class="srange">第7篇</span></div><p class="sdesc">面部如命，气色如运——四时气色与忌色之辨。</p><p class="skey"><b>重点：</b>气为根本</p></div></div></div>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">二、核心概念词典</h3>
+      <div class="cgrid"><div class="concept"><div class="cterm">神骨</div><p class="cdef">精神与骨相——观人的两大根本，全书第一概念。</p><div class="cchap">出处：<a class="citem" href="#ch-1">第一章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-1">第一章</a><span class="osent">一身精神，具乎两目；一身骨相，具乎面部。</span></li></ul></div></div><div class="concept"><div class="cterm">清浊</div><p class="cdef">精神的清明与浑浊——辨神的第一层。</p><div class="cchap">出处：<a class="citem" href="#ch-1">第一章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-1">第一章</a><span class="osent">相家论神，有清浊之辨。清浊易辨，邪正难辨。</span></li></ul></div></div><div class="concept"><div class="cterm">邪正</div><p class="cdef">精神之正与邪——清浊之外更深一层的辨别。</p><div class="cchap">出处：<a class="citem" href="#ch-1">第一章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-1">第一章</a><span class="osent">欲辨邪正，先观动静。</span></li></ul></div></div><div class="concept"><div class="cterm">九起</div><p class="cdef">九种贵相骨隆起处：天庭、枕骨、顶骨、佐串、太阳、眉骨、鼻骨、颧骨、颊骨。</p><div class="cchap">出处：<a class="citem" href="#ch-1">第一章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-1">第一章</a><span class="osent">骨有九起：天庭骨隆起，枕骨强起，顶骨平起，佐串骨角起，太阳骨线起，眉骨伏犀起，鼻骨芽起，颧骨丰起，颊骨平伏起。</span></li></ul></div></div><div class="concept"><div class="cterm">刚柔</div><p class="cdef">五行生克所决定的先天禀赋与性格——分外刚柔与内刚柔。</p><div class="cchap">出处：<a class="citem" href="#ch-2">第二章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-2">第二章</a><span class="osent">既识神骨，当辨刚柔。刚柔即五行生克之数，名曰先天种子。</span></li></ul></div></div><div class="concept"><div class="cterm">五行生克</div><p class="cdef">金木水火土相生相克——古人以此解释人的气质禀赋。</p><div class="cchap">出处：<a class="citem" href="#ch-2">第二章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-2">第二章</a><span class="osent">刚柔即五行生克之数，名曰先天种子。</span></li></ul></div></div><div class="concept"><div class="cterm">逆合</div><p class="cdef">五行逆向相合，如金合火——主贵非常但有严格条件。</p><div class="cchap">出处：<a class="citem" href="#ch-2">第二章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-2">第二章</a><span class="osent">金与火仇，有时合火，推之水土皆然，此逆而合。逆者其贵非常。</span></li></ul></div></div><div class="concept"><div class="cterm">内刚柔</div><p class="cdef">喜怒、伏跳、深浅所体现的内在性格——曾国藩独创的观察维度。</p><div class="cchap">出处：<a class="citem" href="#ch-2">第二章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-2">第二章</a><span class="osent">五行为外刚柔，内刚柔则喜怒、伏跳、深浅者是。</span></li></ul></div></div><div class="concept"><div class="cterm">整</div><p class="cdef">容貌的匀称协调——非整齐划一，而是各部位比例得体。</p><div class="cchap">出处：<a class="citem" href="#ch-3">第三章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-3">第三章</a><span class="osent">容贵整，整非整齐之谓。</span></li></ul></div></div><div class="concept"><div class="cterm">科名星</div><p class="cdef">印堂眉尾处的光气，主早年功名——十三至三十九岁可见。</p><div class="cchap">出处：<a class="citem" href="#ch-3">第三章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-3">第三章</a><span class="osent">科名星见于印堂、眉尾，时隐时见，或为刚针，或为小丸，常有光气。</span></li></ul></div></div><div class="concept"><div class="cterm">阴骘纹</div><p class="cdef">眼角处的纹路，主阴德与晚年发达——十九至四十六岁可见。</p><div class="cchap">出处：<a class="citem" href="#ch-3">第三章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-3">第三章</a><span class="osent">阴骘纹见于眼角，阴雨便见，如三叉样，假寐时最易见。</span></li></ul></div></div><div class="concept"><div class="cterm">情态</div><p class="cdef">动态的神情举止——神之余，佐神之不足。</p><div class="cchap">出处：<a class="citem" href="#ch-4">第四章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-4">第四章</a><span class="osent">情态者，神之余，常佐神之不足。久注观人精神，乍见观人情态。</span></li></ul></div></div><div class="concept"><div class="cterm">弱态</div><p class="cdef">柔弱婉转的情态——飞鸟依人，情致婉转。</p><div class="cchap">出处：<a class="citem" href="#ch-4">第四章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-4">第四章</a><span class="osent">飞鸟依人，情致婉转，此弱态也。</span></li></ul></div></div><div class="concept"><div class="cterm">周旋态</div><p class="cdef">周旋应变的情态——饰其中机，察言观色，趋吉避凶。</p><div class="cchap">出处：<a class="citem" href="#ch-4">第四章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-4">第四章</a><span class="osent">饰其中机，不苟言笑，察言观色，趋吉避凶，此周旋态也。</span></li></ul></div></div><div class="concept"><div class="cterm">恒态</div><p class="cdef">根于本性的恒常情态——弱/狂/疏懒/周旋四类。</p><div class="cchap">出处：<a class="citem" href="#ch-4">第四章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-4">第四章</a><span class="osent">前者恒态，亦有时态。</span></li></ul></div></div><div class="concept"><div class="cterm">时态</div><p class="cdef">一时的情态——神忽他往/极口称是/漫无可否，不必定终身。</p><div class="cchap">出处：<a class="citem" href="#ch-4">第四章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-4">第四章</a><span class="osent">前者恒态，亦有时态。方与对谈，神忽他往。</span></li></ul></div></div><div class="concept"><div class="cterm">彩</div><p class="cdef">眉毛末梢处泛着光泽反光——眉之精华所在。</p><div class="cchap">出处：<a class="citem" href="#ch-5">第五章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-5">第五章</a><span class="osent">眉尚彩，彩者，杪处反光是也。</span></li></ul></div></div><div class="concept"><div class="cterm">声与音</div><p class="cdef">声主张从发处见，音主敛从歇处见——声是发声，音是余韵。</p><div class="cchap">出处：<a class="citem" href="#ch-6">第六章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-6">第六章</a><span class="osent">声与音不同。声主张，寻发处见；音主敛，寻歇处见。</span></li></ul></div></div><div class="concept"><div class="cterm">轻清</div><p class="cdef">声音以轻清为上——轻清上浮，重浊下坠。</p><div class="cchap">出处：<a class="citem" href="#ch-6">第六章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-6">第六章</a><span class="osent">大概以轻清为上。</span></li></ul></div></div><div class="concept"><div class="cterm">命与运</div><p class="cdef">面部如命固定不变，气色如运随时变化。</p><div class="cchap">出处：<a class="citem" href="#ch-7">第七章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-7">第七章</a><span class="osent">面部如命，气色如运。大命固宜整齐，小运亦当亨泰。</span></li></ul></div></div><div class="concept"><div class="cterm">气</div><p class="cdef">人的根本——于内为精神，于外为气色。</p><div class="cchap">出处：<a class="citem" href="#ch-7">第七章</a></div><div class="occ"><div class="occ-head">经典互见</div><ul class="occlist"><li><a class="citem" href="#ch-7">第七章</a><span class="osent">人以气为主，于内为精神，于外为气色。</span></li></ul></div></div></div>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">三、名句摘录</h3>
+      <ul class="qlist"><li><span class="qtext">一身精神，具乎两目；一身骨相，具乎面部。</span> <a class="qchap" href="#ch-1">— 第一章</a><div class="qctx">全书开篇——观人的两大根本。</div></li><li><span class="qtext">他家兼论形骸，文人先观神骨，开门见山，此为第一。</span> <a class="qchap" href="#ch-1">— 第一章</a><div class="qctx">文人相法与市井相术的分野。</div></li><li><span class="qtext">静若含珠，动若水发；静若无人，动若赴敌。</span> <a class="qchap" href="#ch-1">— 第一章</a><div class="qctx">正气清明的动静表现。</div></li><li><span class="qtext">不足用补，有余用泄，消息直与命通。</span> <a class="qchap" href="#ch-2">— 第二章</a><div class="qctx">刚柔调节的总原则。</div></li><li><span class="qtext">内奸者，功名可期。纯奸能豁达者，其人终成。</span> <a class="qchap" href="#ch-2">— 第二章</a><div class="qctx">深沉有谋略者可成大器。</div></li><li><span class="qtext">容贵整，整非整齐之谓。</span> <a class="qchap" href="#ch-3">— 第三章</a><div class="qctx">容貌贵在匀称而非整齐。</div></li><li><span class="qtext">五短多贵，两大不扬。</span> <a class="qchap" href="#ch-3">— 第三章</a><div class="qctx">比例协调优于绝对大小。</div></li><li><span class="qtext">弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器。</span> <a class="qchap" href="#ch-4">— 第四章</a><div class="qctx">有态有度则成器。</div></li><li><span class="qtext">反此以求，可以交天下士。</span> <a class="qchap" href="#ch-4">— 第四章</a><div class="qctx">专注、正直、果断者可交。</div></li><li><span class="qtext">眉尚彩，彩者，杪处反光是也。</span> <a class="qchap" href="#ch-5">— 第五章</a><div class="qctx">眉之精华在于光彩。</div></li><li><span class="qtext">闻声相思，其人斯在，宁必一见决雌雄哉。</span> <a class="qchap" href="#ch-6">— 第六章</a><div class="qctx">声音比外貌更能反映本质。</div></li><li><span class="qtext">开谈若含情，话终多余响，不惟雅人，兼称国士。</span> <a class="qchap" href="#ch-6">— 第六章</a><div class="qctx">说话有真情有余韵者堪为国士。</div></li><li><span class="qtext">面部如命，气色如运。</span> <a class="qchap" href="#ch-7">— 第七章</a><div class="qctx">命与运的分别。</div></li><li><span class="qtext">人以气为主，于内为精神，于外为气色。</span> <a class="qchap" href="#ch-7">— 第七章</a><div class="qctx">气是根本——精神与气色一内一外。</div></li><li><span class="qtext">有一于此，前程退落，祸患再三矣。</span> <a class="qchap" href="#ch-7">— 第七章</a><div class="qctx">凶色之诫——不可不察。</div></li></ul>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">四、参考书目</h3>
+      <ol class="bib"><li><span class="bname">《冰鉴》</span><p>旧题清·曾国藩撰，七篇。以神骨、刚柔、容貌、情态、须眉、声音、气色为序，构建了一套由内而外、由静而动的观人体系。</p></li><li><span class="bname">《曾国藩家书》</span><p>曾国藩著。记载了曾国藩识人用人、观人取友的大量实例，与《冰鉴》相表里。</p></li><li><span class="bname">《人物志》</span><p>三国魏·刘劭著。中国第一部系统的人才学著作，论「九征」「体别」「材理」，与《冰鉴》观人论同源。</p></li><li><span class="bname">《冰鉴注》</span><p>多个网络公开注本，注释仅供参考。</p></li><li><span class="bname">《黄帝内经·素问》</span><p>中医经典，论五色与五脏相应，为《冰鉴》气色论提供了医学基础。</p></li><li><span class="bname">《世说新语》</span><p>南朝宋·刘义庆著。记载了大量人物风度品鉴，与《冰鉴》情态论相通。</p></li></ol>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">五、人物小传</h3>
+      <div class="figrid"><div class="fig"><div class="fname">曾国藩 <span class="ftitle">zēng guó fān</span></div><p>（1811—1872）字伯涵，号涤生，湖南湘乡人。晚清重臣，湘军创立者和统帅，与李鸿章、左宗棠、张之洞并称「晚清四大名臣」。一生善识人、善用人，李鸿章、左宗棠、彭玉麟等皆出其门下。《冰鉴》旧题为其所撰，虽真伪有争议，但其观人识人的经验确有独到之处。</p></div><div class="fig"><div class="fname">刘劭 <span class="ftitle">liú shào</span></div><p>（约182—约245）三国魏思想家。著《人物志》三卷，是中国第一部系统的人才学著作，论「九征」观人法——与《冰鉴》的神骨、刚柔、容貌论一脉相承。</p></div><div class="fig"><div class="fname">郭子仪 <span class="ftitle">guō zǐ yí</span></div><p>（697—781）字子仪，华州郑县人。唐代名将，平定安史之乱的中流砥柱，封汾阳郡王。世称「郭令公」。《冰鉴》须眉篇提及「郭令公半部不全」，意为郭子仪须眉不全却仍极贵。</p></div><div class="fig"><div class="fname">霍去病 <span class="ftitle">huò qù bìng</span></div><p>（前140—前117）西汉名将，河东平阳人。十七岁即随卫青出击匈奴，屡建奇功，封冠军侯，卒年仅二十四。世称「霍剽姚」。《冰鉴》须眉篇提及「霍剽姚一副寡脸」，意为霍去病面相寡薄却仍荣耀。</p></div><div class="fig"><div class="fname">张良 <span class="ftitle">zhāng liáng</span></div><p>（？—前189）字子房，韩国贵族后裔。刘邦重要谋臣，与韩信、萧何并称「汉初三杰」。《史记》载其「状貌如妇人好女」——相不可以一端论。</p></div></div>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">六、章间呼应 · 义理脊柱</h3>
+      <div class="spine"><div class="spnode"><div class="spname">神骨</div><div class="sprange">第1篇</div><p class="spdesc">精神与骨相——观人两大根本，全书总纲。</p></div><div class="spnode"><div class="spname">刚柔</div><div class="sprange">第2篇</div><p class="spdesc">五行外刚柔与性格内刚柔——先天禀赋与后天调节。</p></div><div class="spnode"><div class="spname">容貌</div><div class="sprange">第3篇</div><p class="spdesc">整体比例与局部贵征——从静态形体看人。</p></div><div class="spnode"><div class="spname">情态</div><div class="sprange">第4篇</div><p class="spdesc">动态举止中的清浊取舍——从动态神情看人。</p></div><div class="spnode"><div class="spname">须眉</div><div class="sprange">第5篇</div><p class="spdesc">眉主早成须主晚运——光彩与相称。</p></div><div class="spnode"><div class="spname">声音</div><div class="sprange">第6篇</div><p class="spdesc">声与音的分别——闻声相思，其人斯在。</p></div><div class="spnode"><div class="spname">气色</div><div class="sprange">第7篇</div><p class="spdesc">命与运——四时气色规律与忌色之辨。全书收束。</p></div></div><div class="ech-wrap"><table class="ech"><thead><tr><th>章</th><th>要旨</th><th>呼应章</th><th>说明</th></tr></thead><tbody><tr><td><a class="citem" href="#ch-1">第一章</a></td><td><span class="seg">神骨</span>全书总纲：神骨</td><td><a class="citem" href="#ch-2">第二章</a> · <a class="citem" href="#ch-3">第三章</a> · <a class="citem" href="#ch-4">第四章</a> · <a class="citem" href="#ch-5">第五章</a> · <a class="citem" href="#ch-6">第六章</a> · <a class="citem" href="#ch-7">第七章</a></td><td>第1篇立神骨为观人两大根本，后续六篇依次从刚柔禀赋、容貌形体、情态动态、须眉早晚运、声音声韵、气色变化展开——皆由神骨生发。</td></tr><tr><td><a class="citem" href="#ch-1">第一章</a></td><td><span class="seg">神骨</span>精神与眼神</td><td><a class="citem" href="#ch-1">第一章</a> · <a class="citem" href="#ch-4">第四章</a> · <a class="citem" href="#ch-7">第七章</a></td><td>第1篇「一身精神具乎两目」立精神眼神之纲，第4篇情态论「久注观人精神」呼应，第7篇气色论「于内为精神」收束。</td></tr><tr><td><a class="citem" href="#ch-2">第二章</a></td><td><span class="seg">刚柔</span>刚柔与先天禀赋</td><td><a class="citem" href="#ch-2">第二章</a></td><td>第2篇五行生克之外刚柔与喜怒伏跳深浅之内刚柔——先天种子与后天调节之辨。</td></tr><tr><td><a class="citem" href="#ch-3">第三章</a></td><td><span class="seg">容貌</span>容貌与比例</td><td><a class="citem" href="#ch-3">第三章</a> · <a class="citem" href="#ch-4">第四章</a></td><td>第3篇容貌论「相顾相称」，第4篇情态论「容貌者骨之余」——静态形体与动态举止互补。</td></tr><tr><td><a class="citem" href="#ch-4">第四章</a></td><td><span class="seg">情态</span>情态四态与度</td><td><a class="citem" href="#ch-4">第四章</a></td><td>弱/狂/疏懒/周旋四恒态——根于本性，贵在有度。</td></tr><tr><td><a class="citem" href="#ch-5">第五章</a></td><td><span class="seg">须眉</span>须眉与光彩</td><td><a class="citem" href="#ch-5">第五章</a> · <a class="citem" href="#ch-6">第六章</a></td><td>第5篇须眉论「眉尚彩」，第6篇声音论「轻清为上」——光彩与声韵皆为精神之外征。</td></tr><tr><td><a class="citem" href="#ch-6">第六章</a></td><td><span class="seg">声音</span>声与音</td><td><a class="citem" href="#ch-6">第六章</a> · <a class="citem" href="#ch-7">第七章</a></td><td>第6篇声音论「声主张音主敛」，第7篇气色论「于内为精神于外为气色」——声与气皆由内而外。</td></tr><tr><td><a class="citem" href="#ch-7">第七章</a></td><td><span class="seg">气色</span>全书收束：气色</td><td><a class="citem" href="#ch-1">第一章</a> · <a class="citem" href="#ch-7">第七章</a></td><td>第1篇「一身精神具乎两目」立精神之纲，第7篇「人以气为主，于内为精神，于外为气色」收束——精神为内，气色为外，一以贯之。</td></tr></tbody></table></div>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">九、经典义理与现代处境</h3>
+      <div class="mxgrid"><div class="mxcard"><div class="mxhead"><span class="mxseg">识人焦虑</span></div><p class="mxstress"><b>现代处境</b>　在职场和社交中不知道怎么判断一个人的品行和能力，常常被外表迷惑。</p><p class="mxremedy">一身精神具乎两目，一身骨相具乎面部。观人先观眼——眼神清澈安定的人内心端正，眼神飘忽闪烁的人要多留心。不要先看衣着配饰，先看眼睛里的精神。</p><blockquote class="mxquote">一身精神，具乎两目；一身骨相，具乎面部。</blockquote></div><div class="mxcard"><div class="mxhead"><span class="mxseg">性格焦虑</span></div><p class="mxstress"><b>现代处境</b>　总觉得自己性格不好，想变成另一种人，却怎么也改不了。</p><p class="mxremedy">不足用补，有余用泄。你不必变成另一种人——你是「粗」就练周密，你是「蠢」就练豁达。先天种子决定起点，后天调养决定终点。知道自己不足在哪里，补上去就好。</p><blockquote class="mxquote">不足用补，有余用泄，消息直与命通。</blockquote></div><div class="mxcard"><div class="mxhead"><span class="mxseg">容貌焦虑</span></div><p class="mxstress"><b>现代处境</b>　对自己的外貌不满意，觉得不够好看、不够高、不够瘦。</p><p class="mxremedy">相顾相称则福生。五短多贵，两大不扬。关键不是绝对大小，而是整体比例协调。与其追求单项极致，不如追求整体协调——身高不够比例好照样有气场。</p><blockquote class="mxquote">容贵整，整非整齐之谓。五短多贵，两大不扬。</blockquote></div><div class="mxcard"><div class="mxhead"><span class="mxseg">社交焦虑</span></div><p class="mxstress"><b>现代处境</b>　不知道自己在社交中该表现什么样子，怕太弱被欺负、太狂得罪人。</p><p class="mxremedy">弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器。性格类型没有好坏，关键是有没有「度」。柔弱可以但不谄媚，狂放可以但不喧哗——守好自己性格的边界。</p><blockquote class="mxquote">弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器。</blockquote></div><div class="mxcard"><div class="mxhead"><span class="mxseg">状态焦虑</span></div><p class="mxstress"><b>现代处境</b>　总觉得精神不济、没有光彩，上班如行尸走肉。</p><p class="mxremedy">眉尚彩。光彩不是眉毛的问题，是精神的问题。精神好，眉毛自然有光。调整作息、恢复精神，外在自然就亮了。脸是心的镜子——你要脸色好，先要心气足。</p><blockquote class="mxquote">眉尚彩，彩者，杪处反光是也。</blockquote></div><div class="mxcard"><div class="mxhead"><span class="mxseg">表达焦虑</span></div><p class="mxstress"><b>现代处境</b>　说话没有底气，表达没有影响力，开会发言没人听。</p><p class="mxremedy">闻声相思，其人斯在。声音是人的第二张脸。开谈若含情，话终多余响——说话有真情、说完了还有余味，不仅舒服更靠谱。放慢语速、用丹田发声、说话有始有终。</p><blockquote class="mxquote">开谈若含情，话终多余响，不惟雅人，兼称国士。</blockquote></div><div class="mxcard"><div class="mxhead"><span class="mxseg">健康焦虑</span></div><p class="mxstress"><b>现代处境</b>　脸色不好、气色差，用护肤品也遮不住疲惫。</p><p class="mxremedy">人以气为主，于内为精神，于外为气色。气色不好不是皮肤问题，是精神问题。熬夜、压力、焦虑先伤精神再显气色。与其化妆遮盖，不如调整作息、疏导情绪、恢复精神。</p><blockquote class="mxquote">人以气为主，于内为精神，于外为气色。</blockquote></div></div>
+    </div>
+    <div class="study-block">
+      <h3 class="blk-title">十、引用与出处说明</h3>
+      <div class="citebox"><p>本阅读器中《冰鉴》原文依据维基文库简体版（旧题清·曾国藩撰），属公有领域古籍。译文、串讲、经证链、解读、省察问、安心签、当代焦虑专栏等说明文字均为编者自撰，仅供参考。</p></div>
+    </div>
+  </section>
+
+      <section id="chapters">
+  <article class="chapter view" id="ch-1" data-chapter="1" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">一</span>
+      <div><h2>第一章</h2><p class="lab">神骨</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="1" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>语云：脱<ruby>谷<rt>gǔ</rt></ruby>为<ruby>糠<rt>kāng</rt></ruby>，其<ruby>髓<rt>suǐ</rt></ruby>斯存，神之谓也。山<ruby>骞<rt>qiān</rt></ruby>不崩，惟石为镇，骨之谓也。一身精神，具乎两目；一身骨相，具乎面部。他家兼论形<ruby>骸<rt>hái</rt></ruby>，文人先观神骨，开门见山，此为第一。</p><p>相家论神，有清<ruby>浊<rt>zhuó</rt></ruby>之辨。清<ruby>浊<rt>zhuó</rt></ruby>易辨，<ruby>邪<rt>xié</rt></ruby>正难辨。欲辨<ruby>邪<rt>xié</rt></ruby>正，先观动静。静若含珠，动若水发；静若无人，动若赴敌。此为澄清到底。静若<ruby>萤<rt>yíng</rt></ruby>光，动若流水，尖巧喜淫；静若半睡，动若鹿<ruby>骇<rt>hài</rt></ruby>，别才而深思；一为<ruby>败<rt>bài</rt></ruby>器，一为隐流。均之。<ruby>托<rt>tuō</rt></ruby>迹二清，不可不辨。</p><p>凡精神抖<ruby>擞<rt>sǒu</rt></ruby>时易见，断续时难见。断者出处断，续者闭处续。道家所谓收拾入门之说，不了处看其脱略，做了处看其针线。小心者，从其做不了处看之，<ruby>疏<rt>shū</rt></ruby>节阔目，若不经意，所谓脱略也。大胆者，从其做了处看之，慎重周密，无有<ruby>苟<rt>gǒu</rt></ruby>且，所谓针线也。二者实看向内处，稍移外便落情态矣，情态易见。</p><p>骨有九起：天庭骨<ruby>隆<rt>lóng</rt></ruby>起，<ruby>枕<rt>zhěn</rt></ruby>骨强起，顶骨平起，佐串骨角起，太阳骨线起，眉骨伏<ruby>犀<rt>xī</rt></ruby>起，鼻骨<ruby>芽<rt>yá</rt></ruby>起，<ruby>颧<rt>quán</rt></ruby>骨丰起，<ruby>颊<rt>jiá</rt></ruby>骨平伏起。在头以天庭骨、<ruby>枕<rt>zhěn</rt></ruby>骨、太阳骨为主；在面以眉骨、<ruby>颧<rt>quán</rt></ruby>骨为主。五者备，柱石器也。一则不穷，二则不贱，三动<ruby>履<rt>lǚ</rt></ruby>小胜，四贵异。</p><p>骨有色，面以青为主，少年公卿半青面是也。紫次之，白斯下矣。骨有质，头以联者为贵，<ruby>匾<rt>biǎn</rt></ruby>者次之，碎为最下。总之，头少恶骨，面佳不如头佳。然大而缺天庭，终是贱品；圆而无串骨，半为<ruby>孤<rt>gū</rt></ruby><ruby>僧<rt>sēng</rt></ruby>；鼻骨犯眉，<ruby>堂<rt>táng</rt></ruby>上不寿；<ruby>颧<rt>quán</rt></ruby>与眼争，子<ruby>嗣<rt>sì</rt></ruby>不立。此中贵贱，有毫<ruby>厘<rt>lí</rt></ruby>千里之辨。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">语云：脱<ruby>谷<rt>gǔ</rt></ruby>为<ruby>糠<rt>kāng</rt></ruby>，其<ruby>髓<rt>suǐ</rt></ruby>斯存，神之谓也。</div><div class="tr">常言道：稻谷脱去糠壳，米粒的精华仍在——这就是所谓的「神」。</div></div><div class="srow"><div class="src">山<ruby>骞<rt>qiān</rt></ruby>不崩，惟石为镇，骨之谓也。</div><div class="tr">山崖崩塌了却不散，靠的是岩石支撑——这就是所谓的「骨」。</div></div><div class="srow"><div class="src">一身精神，具乎两目；一身骨相，具乎面部。</div><div class="tr">一个人的精神状态，全集中在两只眼睛上；一个人的骨骼体相，全显现在一张面庞上。</div></div><div class="srow"><div class="src">他家兼论形<ruby>骸<rt>hái</rt></ruby>，文人先观神骨，开门见山，此为第一。</div><div class="tr">其他相术流派连形体四肢一并论，而文人看人先看精神和骨相——直截了当，这是第一步。</div></div><div class="srow"><div class="src">相家论神，有清<ruby>浊<rt>zhuó</rt></ruby>之辨。</div><div class="tr">相术家讨论人的精神，首先要分辨清明与浑浊。</div></div><div class="srow"><div class="src">清<ruby>浊<rt>zhuó</rt></ruby>易辨，<ruby>邪<rt>xié</rt></ruby>正难辨。</div><div class="tr">清浊容易分辨，正邪却难以分辨。</div></div><div class="srow"><div class="src">欲辨<ruby>邪<rt>xié</rt></ruby>正，先观动静。</div><div class="tr">要分辨正邪，先观察一个人安静时和行动时的表现。</div></div><div class="srow"><div class="src">静若含珠，动若水发；静若无人，动若赴敌。</div><div class="tr">安静时像眼中含着明珠般内敛，行动时像泉水涌出般流畅；安静时仿佛旁若无人，行动时像奔赴敌阵般果决——这是正气澄澈到底的表现。</div></div><div class="srow"><div class="src">此为澄清到底。</div><div class="tr">以上所说的，就是精神清正透彻到极点的样子。</div></div><div class="srow"><div class="src">静若<ruby>萤<rt>yíng</rt></ruby>光，动若流水，尖巧喜淫；</div><div class="tr">安静时目光像萤火虫般闪烁不定，行动时像流水般飘忽滑溜——这是心思狡巧、容易沉迷于声色的人；</div></div><div class="srow"><div class="src">静若半睡，动若鹿<ruby>骇<rt>hài</rt></ruby>，别才而深思；</div><div class="tr">安静时像半睡半醒般朦胧，行动时像受惊的鹿般仓皇——这是有偏才而心思深沉的人；</div></div><div class="srow"><div class="src">一为<ruby>败<rt>bài</rt></ruby>器，一为隐流。</div><div class="tr">前者是败坏的器量，后者是隐伏的暗流。</div></div><div class="srow"><div class="src">均之。<ruby>托<rt>tuō</rt></ruby>迹二清，不可不辨。</div><div class="tr">这两种人都貌似清明——混在清正之人中，不能不仔细分辨。</div></div><div class="srow"><div class="src">凡精神抖<ruby>擞<rt>sǒu</rt></ruby>时易见，断续时难见。</div><div class="tr">大凡一个人精神振奋时容易看清，精神断断续续时却难以看清。</div></div><div class="srow"><div class="src">断者出处断，续者闭处续。</div><div class="tr">所谓「断」，是在该表现的时候中断了；所谓「续」，是在该收敛的时候又冒出来。</div></div><div class="srow"><div class="src">道家所谓收拾入门之说，不了处看其脱略，做了处看其针线。</div><div class="tr">道家有「收拾入门」的说法：从一个人做不完整的地方看他的疏漏放任，从一个人做完了的地方看他的周密细致。</div></div><div class="srow"><div class="src">小心者，从其做不了处看之，<ruby>疏<rt>shū</rt></ruby>节阔目，若不经意，所谓脱略也。</div><div class="tr">谨慎的人，从做不好的地方看他——会发现他反而疏阔大略，好像漫不经心，这就是所谓的「脱略」。</div></div><div class="srow"><div class="src">大胆者，从其做了处看之，慎重周密，无有<ruby>苟<rt>gǒu</rt></ruby>且，所谓针线也。</div><div class="tr">胆大的人，从做完了的地方看他——会发现他反而谨慎周密，没有一丝马虎，这就是所谓的「针线」。</div></div><div class="srow"><div class="src">二者实看向内处，稍移外便落情态矣，情态易见。</div><div class="tr">这两种观察实际上都是看人的内在精神，稍微向外移一点就落入情态范畴了——情态是比较容易看出来的。</div></div><div class="srow"><div class="src">骨有九起：天庭骨<ruby>隆<rt>lóng</rt></ruby>起，<ruby>枕<rt>zhěn</rt></ruby>骨强起，顶骨平起，佐串骨角起，太阳骨线起，眉骨伏<ruby>犀<rt>xī</rt></ruby>起，鼻骨<ruby>芽<rt>yá</rt></ruby>起，<ruby>颧<rt>quán</rt></ruby>骨丰起，<ruby>颊<rt>jiá</rt></ruby>骨平伏起。</div><div class="tr">头面骨骼有九种贵相隆起：天庭骨高隆，枕骨强硬，顶骨平阔，佐串骨如角，太阳骨如线，眉骨如伏犀，鼻骨如笋芽，颧骨丰满，颊骨平而微伏。</div></div><div class="srow"><div class="src">在头以天庭骨、<ruby>枕<rt>zhěn</rt></ruby>骨、太阳骨为主；在面以眉骨、<ruby>颴<rt>quán</rt></ruby>骨为主。</div><div class="tr">头部以天庭骨、枕骨、太阳骨为主要判断依据；面部以眉骨、颴骨为主要判断依据。</div></div><div class="srow"><div class="src">五者备，柱石器也。</div><div class="tr">这五处都具备的人，是国家栋梁之器。</div></div><div class="srow"><div class="src">一则不穷，二则不贱，三动<ruby>履<rt>lǚ</rt></ruby>小胜，四贵异。</div><div class="tr">具备一处则不会困穷，两处则不会贫贱，三处则做事处处小胜，四处则大贵超群。</div></div><div class="srow"><div class="src">骨有色，面以青为主，少年公卿半青面是也。</div><div class="tr">骨骼还看颜色，面部以青色为最佳——年轻时便位居公卿的人，多半面带青色。</div></div><div class="srow"><div class="src">紫次之，白斯下矣。</div><div class="tr">紫色次一等，白色就是最差的了。</div></div><div class="srow"><div class="src">骨有质，头以联者为贵，<ruby>匾<rt>biǎn</rt></ruby>者次之，碎为最下。</div><div class="tr">骨骼还看质地：头部以骨块连贯紧密为贵，扁平的次一等，零碎分散的是最差的。</div></div><div class="srow"><div class="src">总之，头少恶骨，面佳不如头佳。</div><div class="tr">总而言之，头上不宜有劣骨——面相再好，也不如头相好。</div></div><div class="srow"><div class="src">然大而缺天庭，终是贱品；</div><div class="tr">但头大却没有天庭骨的人，终究是低贱之相；</div></div><div class="srow"><div class="src">圆而无串骨，半为<ruby>孤<rt>gū</rt></ruby><ruby>僧<rt>sēng</rt></ruby>；</div><div class="tr">头圆却没有佐串骨的人，多半会做孤独的僧人；</div></div><div class="srow"><div class="src">鼻骨犯眉，<ruby>堂<rt>táng</rt></ruby>上不寿；</div><div class="tr">鼻骨上冲到眉毛，父母长辈难以长寿；</div></div><div class="srow"><div class="src"><ruby>颴<rt>quán</rt></ruby>与眼争，子<ruby>嗣<rt>sì</rt></ruby>不立。</div><div class="tr">颴骨过高与眼睛争势，后代难以成立。</div></div><div class="srow"><div class="src">此中贵贱，有毫<ruby>厘<rt>lí</rt></ruby>千里之辨。</div><div class="tr">这些贵贱的分别，差之毫厘谬以千里，必须仔细辨别。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>脱谷为糠</b>　去掉稻谷的糠壳，米粒精华犹存——比喻去掉外形，神仍在。</li><li><b>山骞不崩</b>　山崖虽有缺损却不崩塌，靠岩石支撑——比喻骨相为人的根基。</li><li><b>清浊</b>　精神的清明与浑浊。清者正，浊者邪。</li><li><b>邪正</b>　正与邪的辨别——清浊之外更深一层。</li><li><b>动静</b>　安静时与行动时的精神表现。</li><li><b>含珠</b>　安静时眼中似含明珠，内敛有光而不外露。</li><li><b>萤光</b>　目光闪烁如萤火——不稳定，主尖巧喜淫。</li><li><b>鹿骇</b>　行动时如受惊的鹿——仓皇不定，主别才而深思。</li><li><b>败器</b>　败坏的器量——外表似清实浊。</li><li><b>隐流</b>　隐伏的暗流——表面深沉实则有别才。</li><li><b>九起</b>　九种贵相的骨隆起处。</li><li><b>天庭骨</b>　额头正中之骨，主贵贱大端。</li><li><b>枕骨</b>　后脑之骨，主寿夭根基。</li><li><b>佐串骨</b>　太阳穴上方之骨，主早年运势。</li><li><b>伏犀</b>　眉骨隐起如伏卧的犀牛角，主贵。</li><li><b>柱石器</b>　国之栋梁、柱石之器。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇为全书第一篇，主题：神骨——观人的精神与骨相。</p><p>开篇即立总纲：「一身精神，具乎两目；一身骨相，具乎面部。」这是《冰鉴》七篇的出发点——先观内在精神，再观外在骨相，一内一外，一神一形。</p><p>关键句解读：「他家兼论形骸，文人先观神骨」——曾国藩将「文人相法」与市井相术做了区分。市井相术重形体四肢，而文人观人重在精神骨相——也就是从一个人的眼睛和面骨入手，直取根本。这是「开门见山」的第一步。</p><p>次段论精神邪正之辨：清浊易辨，邪正难辨。曾国藩给出了一套动静观察法——静若含珠、动若水发为正；静若萤光、动若流水为邪巧；静若半睡、动若鹿骇为别才。三者貌似清明，实则一正二邪——「不可不辨」。</p><p>第三段论精神之断续：精神抖擞时容易看清，断续时难以看清。曾国藩用道家的「收拾入门」之说，从一个人做事的「不了处」和「了处」分别看其脱略与针线——这是观察人内在精神的实操方法。</p><p>第四段论九骨：天庭、枕骨、顶骨、佐串、太阳、眉骨、鼻骨、颴骨、颊骨——九处骨隆起各有贵贱。头部以天庭、枕骨、太阳为主；面部以眉骨、颴骨为主。五者具备则为柱石之器。</p><p>末段论骨之色与质：面以青为主，紫次之，白为下。头以联者为贵，碎为最下。并列举了几种凶相：大而缺天庭、圆而无串骨、鼻骨犯眉、颴与眼争——「毫厘千里之辨」。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《孟子·离娄上</span><span class="jzpass">存乎人者，莫良于眸子。眸子不能掩其恶。胸中正，则眸子瞭焉；胸中不正，则眸子眊焉。</span><span class="jznote">孟子论观人之眼——与曾国藩「一身精神具乎两目」同一理路。</span></li><li><span class="jzbook">《论语·为政</span><span class="jzpass">视其所以，观其所由，察其所安。人焉廋哉？人焉廋哉？</span><span class="jznote">孔子论观人之法——视、观、察三步，与《冰鉴》动静观察法相通。</span></li><li><span class="jzbook">《人物志·九征</span><span class="jzpass">征神见貌，则情彩之所由，各自通焉。</span><span class="jznote">刘劭《人物志》亦论神貌相应，与《冰鉴》神骨论同源。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「一身精神，具乎两目」——观人先观眼。这不是迷信，而是经验之谈。一个人精神饱满还是萎靡不振，目光坚定还是游移不定，往往比言语更真实。面试、谈合作、交朋友——先看眼睛。眼神清澈、安定、有光的人，内心大多端正；眼神浑浊、闪烁、飘忽的人，就要多留心。曾国藩一生阅人无数，靠的就是这一招：不先看穿什么衣、什么表，先看眼睛里的精神。</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇是全书总纲——「神骨」二字，即精神与骨相，一内一外。读时注意曾国藩如何从「两目」观神、从「面部」观骨，层层推进：先论神之清浊邪正，再论神之断续，最后论九骨之贵贱、骨色与骨质。全书七篇，此后六篇（刚柔、容貌、情态、须眉、声音、气色）皆是「神骨」的展开与补充。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你观察别人时，有没有先从「精神」和「眼神」入手？</li><li>你的眼神传达了什么？是安定清澈还是飘忽不定？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-1">0</span> 字</label><textarea class="sheng-note" id="shengNote-1" data-n="1" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+  <article class="chapter view" id="ch-2" data-chapter="2" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">二</span>
+      <div><h2>第二章</h2><p class="lab">刚柔</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="2" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>既识神骨，当辨刚柔。刚柔即五行生<ruby>克<rt>kè</rt></ruby>之数，名曰先天种子。不足用补，有余用<ruby class="tj" title="此处原作「洩」，同「泄」，疏导消散。「有余用洩」即有余则疏导。">泄<rt>xiè</rt></ruby>，消息直与命通，此其<ruby>皎<rt>jiǎo</rt></ruby>然易见。</p><p>五行有合法。木合火，水合木，此顺而合。顺者多富，即贵亦在浮沉之间。金与火<ruby>仇<rt>chóu</rt></ruby>，有时合火，推之水土皆然，此逆而合。逆者其贵非常。然所谓逆合者，金形带火则然，火形带金则三十死矣；水形带土则然，土形带水则<ruby>孤<rt>gū</rt></ruby>寒老矣；木形带金则然，金形带木则刀剑随身矣。此外牵合，俱是杂格，不入文人正论。</p><p>五行为外刚柔，内刚柔则喜怒、伏跳、深浅者是。喜高怒重，过目辄忘，近粗。伏亦不<ruby class="tj" title="通「抗」，匹敌、相当。「伏亦不伉」即伏蛰时也不能抗衡。">伉<rt>kàng</rt></ruby>，跳亦不<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，近<ruby>蠢<rt>chǔn</rt></ruby>。初念甚浅，转念甚深，近<ruby>奸<rt>jiān</rt></ruby>。内<ruby>奸<rt>jiān</rt></ruby>者，功名可期。粗<ruby>蠢<rt>chǔn</rt></ruby>各半者，胜人以寿。纯<ruby>奸<rt>jiān</rt></ruby>能<ruby>豁<rt>huò</rt></ruby>达者，其人终成。纯粗无周密者，半途必弃。观人所忽，十得八九矣。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">既识神骨，当辨刚柔。</div><div class="tr">认清了神骨之后，接下来要分辨刚柔。</div></div><div class="srow"><div class="src">刚柔即五行生<ruby>克<rt>kè</rt></ruby>之数，名曰先天种子。</div><div class="tr">刚柔的原理就是五行相生相克的定数，叫做「先天的种子」。</div></div><div class="srow"><div class="src">不足用补，有余用<ruby class="tj" title="此处原作「洩」，同「泄」，疏导消散。「有余用洩」即有余则疏导。">泄<rt>xiè</rt></ruby>，消息直与命通，此其<ruby>皎<rt>jiǎo</rt></ruby>然易见。</div><div class="tr">不足的就加以弥补，有余的就加以疏导消泄——这种消长变化与命运直接相通，是非常明白易见的道理。</div></div><div class="srow"><div class="src">五行有合法。</div><div class="tr">五行之间有相合的关系。</div></div><div class="srow"><div class="src">木合火，水合木，此顺而合。</div><div class="tr">木与火相合，水与木相合——这是顺向相合。</div></div><div class="srow"><div class="src">顺者多富，即贵亦在浮沉之间。</div><div class="tr">顺合的人大多富裕，即使显贵也在浮沉之间不甚稳定。</div></div><div class="srow"><div class="src">金与火<ruby>仇<rt>chóu</rt></ruby>，有时合火，推之水土皆然，此逆而合。</div><div class="tr">金与火本是相克的仇敌，有时却反而与火相合——推而广之，水与土等也是如此，这叫做逆向相合。</div></div><div class="srow"><div class="src">逆者其贵非常。</div><div class="tr">逆合的人，其显贵不同寻常。</div></div><div class="srow"><div class="src">然所谓逆合者，金形带火则然，火形带金则三十死矣；</div><div class="tr">但所谓逆合是有条件的：金形人带火色则可以，火形人带金色则活不过三十岁；</div></div><div class="srow"><div class="src">水形带土则然，土形带水则<ruby>孤<rt>gū</rt></ruby>寒老矣；</div><div class="tr">水形人带土色则可以，土形人带水色则孤寒到老；</div></div><div class="srow"><div class="src">木形带金则然，金形带木则刀剑随身矣。</div><div class="tr">木形人带金色则可以，金形人带木色则刀剑之灾随身。</div></div><div class="srow"><div class="src">此外牵合，俱是杂格，不入文人正论。</div><div class="tr">此外的牵强凑合，都是杂格，不能纳入文人正统的讨论。</div></div><div class="srow"><div class="src">五行为外刚柔，内刚柔则喜怒、伏跳、深浅者是。</div><div class="tr">五行构成的是外在的刚柔，内在的刚柔则体现在喜怒、伏跳、深浅三个方面。</div></div><div class="srow"><div class="src">喜高怒重，过目辄忘，近粗。</div><div class="tr">高兴时得意忘形，发怒时暴烈失控，但事过就忘——这接近「粗」。</div></div><div class="srow"><div class="src">伏亦不<ruby class="tj" title="通「抗」，匹敌、相当。「伏亦不伉」即伏蛰时也不能抗衡。">伉<rt>kàng</rt></ruby>，跳亦不<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，近<ruby>蠢<rt>chǔn</rt></ruby>。</div><div class="tr">蛰伏时不能昂然自立，跳动时也不能振奋飞扬——这接近「蠢」。</div></div><div class="srow"><div class="src">初念甚浅，转念甚深，近<ruby>奸<rt>jiān</rt></ruby>。</div><div class="tr">最初的念头很浅薄，转念之间却想得很深——这接近「奸」。</div></div><div class="srow"><div class="src">内<ruby>奸<rt>jiān</rt></ruby>者，功名可期。</div><div class="tr">内心深沉而有谋略的人，功名可以期待。</div></div><div class="srow"><div class="src">粗<ruby>蠢<rt>chǔn</rt></ruby>各半者，胜人以寿。</div><div class="tr">粗和蠢各占一半的人，以长寿胜过他人。</div></div><div class="srow"><div class="src">纯<ruby>奸<rt>jiān</rt></ruby>能<ruby>豁<rt>huò</rt></ruby>达者，其人终成。</div><div class="tr">纯粹深沉却能豁达开朗的人，最终必定成功。</div></div><div class="srow"><div class="src">纯粗无周密者，半途必弃。</div><div class="tr">纯粹粗疏而毫无周密之心的人，必定半途而废。</div></div><div class="srow"><div class="src">观人所忽，十得八九矣。</div><div class="tr">观察别人容易忽略的内在刚柔，十成之中可以看准八九成。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>刚柔</b>　刚与柔——此处特指五行生克所决定的人的先天气质禀赋。</li><li><b>五行生克</b>　金木水火土相生相克——古人以此解释人的气质禀赋差异。</li><li><b>先天种子</b>　与生俱来的气质根基，如种子般决定后天发展。</li><li><b>不足用补，有余用泄</b>　不足则补益，有余则疏泄——养生与调性的总则。</li><li><b>消息</b>　消长变化——此指与命运相通。</li><li><b>顺合</b>　五行顺向相合，如木合火、水合木。主富。</li><li><b>逆合</b>　五行逆向相合，如金合火、水合土。主贵非常。</li><li><b>外刚柔</b>　五行所决定的外在气质——体型、肤色等。</li><li><b>内刚柔</b>　喜怒、伏跳、深浅所体现的内在性格。</li><li><b>伏跳</b>　蛰伏与跳动——指人的行动与收敛两种状态。</li><li><b>深浅</b>　初念与转念的深浅——指人的思虑层次。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇主题：刚柔——五行生克的先天禀赋与内在性格。</p><p>第一段论外刚柔：五行生克之数。曾国藩将人的气质禀赋归为五行关系——木合火、水合木是顺合，主富；金合火、水合土是逆合，主贵。但逆合有严格条件：金形带火可以，火形带金则三十岁就死了——方向不同，结果天壤之别。</p><p>关键句解读：「不足用补，有余用泄，消息直与命通」——这是中国传统医学和相术共通的原则。不足则补，有余则泄，保持平衡。人的气质禀赋是先天的「种子」，但后天的调养可以弥补或疏导——这就是曾国藩的可贵之处：他不是宿命论者，他相信人可以在先天禀赋的基础上后天调节。</p><p>第二段论内刚柔：喜怒、伏跳、深浅。这是曾国藩独创的观察维度——不外在看五行体型，而内在看性格反应。喜高怒重、过目辄忘的人「近粗」；伏不伉、跳不扬的人「近蠢」；初念浅、转念深的人「近奸」。</p><p>关键句解读：「内奸者，功名可期」「纯奸能豁达者，其人终成」——曾国藩对「奸」字的理解与世俗不同。他说的「奸」不是阴险狡诈，而是深沉有谋略、善于转念。这种人在功名上可期，若还能豁达则终成大器。而「纯粗无周密者，半途必弃」——只知粗疏行事而毫无周密的人，必定半途而废。</p><p>末句「观人所忽，十得八九矣」——观人要看别人忽略的内在之处，十成可看准八九成。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《黄帝内经·素问</span><span class="jzpass">阴平阳秘，精神乃治。</span><span class="jznote">阴阳平衡则精神安定——与「不足用补，有余用泄」同理。</span></li><li><span class="jzbook">《人物志·体别</span><span class="jzpass">强毅之人，狷介刚直，其在趣也，雄直恢远，要以厉名。</span><span class="jznote">刘劭论刚柔之性——与曾国藩内刚柔之辨同源。</span></li><li><span class="jzbook">《道德经》第四十二章</span><span class="jzpass">万物负阴而抱阳，冲气以为和。</span><span class="jznote">老子论阴阳冲和——刚柔平衡之道。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「不足用补，有余用泄」——这是养生也是养性的铁律。性格太急的（有余）要泄一泄，学慢、学忍；性格太弱的（不足）要补一补，练胆、练果断。曾国藩自己就是「近粗」之人——喜高怒重、过目辄忘。他怎么做的？日课十二条，天天反省，硬生生把粗疏改成了周密。先天种子决定起点，后天调养决定终点。你不必抱怨禀赋，关键是知道自己的「不足」在哪里，然后「补」上去。</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇从外刚柔（五行）到内刚柔（喜怒伏跳深浅），层层深入。读时注意：曾国藩说的「奸」不是贬义，而是深沉有谋略的意思。他甚至认为「内奸者，功名可期」「纯奸能豁达者终成」——深沉而不狭隘，才是大器之才。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你的先天禀赋偏刚还是偏柔？你有没有「补」或「泄」？</li><li>你是初念浅还是转念深的人？你有没有「豁达」来平衡深沉？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-2">0</span> 字</label><textarea class="sheng-note" id="shengNote-2" data-n="2" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+  <article class="chapter view" id="ch-3" data-chapter="3" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">三</span>
+      <div><h2>第三章</h2><p class="lab">容貌</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="3" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>容以七尺为期，貌合两仪而论。背腹手足，实接五方；耳目口鼻，全通四气。相顾相称则福生，如肖如凑，则林林总总不足论也。</p><p>容贵整，整非整齐之谓。短不<ruby>豕<rt>shǐ</rt></ruby><ruby>蹲<rt>dūn</rt></ruby>，长不<ruby>茅<rt>máo</rt></ruby>立，肥不熊餐，瘦不<ruby>鹊<rt>què</rt></ruby>寒，所谓整也。背宜圆，腹宜突<ruby>坦<rt>tǎn</rt></ruby>，手宜温软，曲若弯弓，足宜丰满，下宜藏蛋，所谓整也。五短多贵，两大不<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，负重高官，鼠行好利，此为定格。他如手长其身，身长过于体，配以佳骨，定主封侯。<ruby>罗<rt>luó</rt></ruby>纹满身，胸有秀骨，配以妙神，不拜相即<ruby>鼎<rt>dǐng</rt></ruby>甲。</p><p>相貌家有清、古、奇、秀之别，总之不必，须看科名星、阴<ruby>骘<rt>zhì</rt></ruby>纹为主。科名星，十三岁至三十九岁随时而见；阴<ruby>骘<rt>zhì</rt></ruby>纹，十九岁至四十六岁随时而见。二见全，大物也，得一亦贵。科名星见于<ruby>印<rt>yìn</rt></ruby><ruby>堂<rt>táng</rt></ruby>、眉尾，时隐时见，或为刚针，或为小丸，常有光气，酒后及发怒时易见。阴<ruby>骘<rt>zhì</rt></ruby>纹见于眼角，阴雨便见，如三叉样，假寐时最易见。得科名星早发，得阴<ruby>骘<rt>zhì</rt></ruby>纹迟发。二者全无，前程莫问。阴<ruby>骘<rt>zhì</rt></ruby>纹见于喉间，又主子贵，杂路不在此格。</p><p>目者面之<ruby>渊<rt>yuān</rt></ruby>，不深则不清；鼻者面之山，不高则不灵。口阔而方禄千<ruby>钟<rt>zhōng</rt></ruby>，齿多而固不家食。眼角入<ruby>鬓<rt>bìn</rt></ruby>，必掌刑名；耳白过面，终身钱<ruby>谷<rt>gǔ</rt></ruby>。此贵征也。舌脱无官，<ruby>橘<rt>jú</rt></ruby>面不显；文人不伤在眼，<ruby>鹰<rt>yīng</rt></ruby>准动便食人。此贱征也。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">容以七尺为期，貌合两仪而论。</div><div class="tr">人的身容以七尺之躯为考量基准，面部相貌则结合阴阳两仪来综合判断。</div></div><div class="srow"><div class="src">背腹手足，实接五方；耳目口鼻，全通四气。</div><div class="tr">背部、腹部、手、脚，对应着东西南北中五方；耳朵、眼睛、嘴巴、鼻子，贯通着春夏秋冬四时之气。</div></div><div class="srow"><div class="src">相顾相称则福生，如肖如凑，则林林总总不足论也。</div><div class="tr">各部位相互照应、彼此匀称就生福相；如果只是各部分各自相似或生硬拼凑，那就不过是芸芸众生，不值一提了。</div></div><div class="srow"><div class="src">容贵整，整非整齐之谓。</div><div class="tr">身容以「整」为贵——但「整」不是整齐划一的意思。</div></div><div class="srow"><div class="src">短不<ruby>豕<rt>shǐ</rt></ruby><ruby>蹲<rt>dūn</rt></ruby>，长不<ruby>茅<rt>máo</rt></ruby>立，肥不熊餐，瘦不<ruby>鹊<rt>què</rt></ruby>寒，所谓整也。</div><div class="tr">个子矮但不能像猪一样蹲着，个子高但不能像茅草一样僵直，体胖但不能像熊进食般笨拙，体瘦但不能像喜鹊般瑟缩——这才是「整」。</div></div><div class="srow"><div class="src">背宜圆，腹宜突<ruby>坦<rt>tǎn</rt></ruby>，手宜温软，曲若弯弓，足宜丰满，下宜藏蛋，所谓整也。</div><div class="tr">背部应当圆润，腹部应当微突而坦阔，手应当温润柔软、弯曲如弓，脚应当丰满厚实、脚心拱起能藏住一个蛋——这也是「整」。</div></div><div class="srow"><div class="src">五短多贵，两大不<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，负重高官，鼠行好利，此为定格。</div><div class="tr">五短身材（头面手足身都短）的人多主贵，两大身材（手脚大）的人不够扬达；走路像背负重物的人可做高官，走路像老鼠般碎步的人贪图小利——这些都是固定的格局。</div></div><div class="srow"><div class="src">他如手长其身，身长过于体，配以佳骨，定主封侯。</div><div class="tr">其他如手臂超过身长、身长超过常人，再配上好的骨相，必定能封侯拜将。</div></div><div class="srow"><div class="src"><ruby>罗<rt>luó</rt></ruby>纹满身，胸有秀骨，配以妙神，不拜相即<ruby>鼎<rt>dǐng</rt></ruby>甲。</div><div class="tr">全身皮肤如罗缎般细腻、胸口有清秀之骨，再配上精妙的神气——不当宰相也是三甲之才。</div></div><div class="srow"><div class="src">相貌家有清、古、奇、秀之别，总之不必，须看科名星、阴<ruby>骘<rt>zhì</rt></ruby>纹为主。</div><div class="tr">相术家把相貌分为清、古、奇、秀四类，但总的来说不必拘泥于此——应当以科名星和阴骘纹为主要判断依据。</div></div><div class="srow"><div class="src">科名星，十三岁至三十九岁随时而见；阴<ruby>骘<rt>zhì</rt></ruby>纹，十九岁至四十六岁随时而见。</div><div class="tr">科名星在十三岁到三十九岁之间随时可能显现；阴骘纹在十九岁到四十六岁之间随时可能显现。</div></div><div class="srow"><div class="src">二见全，大物也，得一亦贵。</div><div class="tr">两种都能看到的人，是大器之才；只具备一种也能显贵。</div></div><div class="srow"><div class="src">科名星见于<ruby>印<rt>yìn</rt></ruby><ruby>堂<rt>táng</rt></ruby>、眉尾，时隐时见，或为刚针，或为小丸，常有光气，酒后及发怒时易见。</div><div class="tr">科名星出现在印堂和眉尾处，时隐时现，有时像一根钢针，有时像一颗小丸子，常有光气笼罩——饮酒后和发怒时最容易看到。</div></div><div class="srow"><div class="src">阴<ruby>骘<rt>zhì</rt></ruby>纹见于眼角，阴雨便见，如三叉样，假寐时最易见。</div><div class="tr">阴骘纹出现在眼角处，阴天下雨时容易看见，形状像三叉——半睡半醒时最容易看到。</div></div><div class="srow"><div class="src">得科名星早发，得阴<ruby>骘<rt>zhì</rt></ruby>纹迟发。</div><div class="tr">有科名星的人早年发达，有阴骘纹的人晚年发达。</div></div><div class="srow"><div class="src">二者全无，前程莫问。</div><div class="tr">两种都没有的人，前程就不必过问了。</div></div><div class="srow"><div class="src">阴<ruby>骘<rt>zhì</rt></ruby>纹见于喉间，又主子贵，杂路不在此格。</div><div class="tr">阴骘纹如果出现在喉咙处，还主后代显贵——至于其他杂路的相法不在这个格局之内。</div></div><div class="srow"><div class="src">目者面之<ruby>渊<rt>yuān</rt></ruby>，不深则不清；鼻者面之山，不高则不灵。</div><div class="tr">眼睛是面部的深潭——不够深就不清朗；鼻子是面部的山岳——不够高就不灵秀。</div></div><div class="srow"><div class="src">口阔而方禄千<ruby>钟<rt>zhōng</rt></ruby>，齿多而固不家食。</div><div class="tr">嘴巴宽阔方正的人俸禄丰厚，牙齿多而坚固的人不在家中吃饭（有外出食禄之命）。</div></div><div class="srow"><div class="src">眼角入<ruby>鬓<rt>bìn</rt></ruby>，必掌刑名；耳白过面，终身钱<ruby>谷<rt>gǔ</rt></ruby>。</div><div class="tr">眼角上挑入鬓的人，必定执掌刑法之权；耳朵比脸色还白的人，终身掌管钱粮财务。</div></div><div class="srow"><div class="src">此贵征也。</div><div class="tr">以上这些都是显贵的征兆。</div></div><div class="srow"><div class="src">舌脱无官，<ruby>橘<rt>jú</rt></ruby>面不显；文人不伤在眼，<ruby>鹰<rt>yīng</rt></ruby>准动便食人。</div><div class="tr">说话时舌头外露的人做不了官，面色如橘皮般粗糙的人难以显达；文人的相不宜在眼睛上有缺陷，鼻子如鹰喙般尖钩的人动辄伤人。</div></div><div class="srow"><div class="src">此贱征也。</div><div class="tr">以上这些则是低贱的征兆。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>容</b>　人的身容——整体体态身形。</li><li><b>貌</b>　人的面部相貌——五官长相。</li><li><b>两仪</b>　阴阳两仪——此处指面部的阴阳部位。</li><li><b>五方</b>　东西南北中——对应背腹手足。</li><li><b>四气</b>　春夏秋冬四时之气——对应耳目口鼻。</li><li><b>整</b>　匀称得体——非整齐划一，而是各部位比例协调。</li><li><b>豕蹲</b>　像猪一样蹲着——矮而局促，不雅。</li><li><b>茅立</b>　像茅草一样僵直——高而僵硬，不活。</li><li><b>罗纹</b>　罗缎般的细腻纹理——指皮肤细腻。</li><li><b>科名星</b>　印堂、眉尾处的光气——主功名早发。</li><li><b>阴骘纹</b>　眼角处的纹路——主阴德与晚发。</li><li><b>鼎甲</b>　科举前三甲——状元、榜眼、探花。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇主题：容貌——身容体貌与贵贱征兆。</p><p>第一段论容貌之理：容以七尺为期，貌合两仪而论。背腹手足接五方，耳目口鼻通四气——这是中国相术的天人合一框架。关键在「相顾相称则福生」：各部位相互照应、比例匀称就生福。</p><p>第二段论「整」：整不是整齐，而是匀称得体。短不豕蹲、长不茅立、肥不熊餐、瘦不鹊寒——四种极端都不好，关键是比例协调。背圆、腹坦、手软、足满，都是「整」的表现。</p><p>关键句解读：「五短多贵，两大不扬」——五短身材（头面手足身都短但比例匀称）的人多主贵。这与一般人「高大才好」的偏见相反。曾国藩观察的是比例，不是绝对大小。</p><p>第三段论科名星与阴骘纹：这是容貌篇的核心概念。科名星主早年功名，十三至三十九岁可见；阴骘纹主晚年发达，十九至四十六岁可见。两种都有是「大物」，只有一种也能贵。</p><p>第四段论五官贵贱：目深则清、鼻高则灵、口阔方则禄厚、齿固则不家食、眼角入鬓掌刑名、耳白过面掌钱谷——这些是贵征。舌脱无官、橘面不显、鹰准动便食人——这些是贱征。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《人物志·容貌</span><span class="jzpass">容之动作，发乎心气。心气之征，则容变其度。</span><span class="jznote">刘劭论容貌与心气相应——与曾国藩容貌论同源。</span></li><li><span class="jzbook">《左传·文公元年</span><span class="jzpass">内史叔服相公孙敖之子，曰：今梦赗者，颔也，其必大。</span><span class="jznote">《左传》已有以面貌论贵贱之记载——相术渊源甚早。</span></li><li><span class="jzbook">《论语·述而</span><span class="jzpass">子温而厉，威而不猛，恭而安。</span><span class="jznote">孔子之容——温厉威恭，各得其度，正是「整」。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「相顾相称则福生」——这不仅是相术，更是处世哲学。一个人的整体协调比单个优长更重要：身高不够但比例好，照样有气场；五官不算美但搭配和谐，看着就舒服。职场同理：不是某一项特别强就好，而是各项能力相称协调。什么都强反而可能「如肖如凑」——拼凑而非浑然。与其追求单项极致，不如追求整体协调。</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇论容貌身形——从整体比例到局部特征。读时注意三个层次：① 容貌之理（相顾相称）→ ② 整之要义（不拘长短肥瘦，贵在比例）→ ③ 科名星与阴骘纹（功名与阴德的征兆）→ ④ 五官贵贱征兆。整篇贯穿着一个原则：比例协调、相顾相称优于绝对标准。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你的整体「相顾相称」吗？还是某一处特别突出而失衡？</li><li>你有没有「阴骘纹」——积累阴德而不张扬？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-3">0</span> 字</label><textarea class="sheng-note" id="shengNote-3" data-n="3" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+  <article class="chapter view" id="ch-4" data-chapter="4" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">四</span>
+      <div><h2>第四章</h2><p class="lab">情态</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="4" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>容貌者，骨之余，常佐骨之不足。情态者，神之余，常佐神之不足。久注观人精神，乍见观人情态。大家举止，<ruby>羞<rt>xiū</rt></ruby><ruby>涩<rt>sè</rt></ruby>亦佳；小儿行藏，跳叫愈失。大旨亦辨清<ruby>浊<rt>zhuó</rt></ruby>，细处兼论取舍。</p><p>人有弱态，有狂态，有<ruby>疏<rt>shū</rt></ruby>懒态，有周旋态。飞鸟依人，情致<ruby>婉<rt>wǎn</rt></ruby>转，此弱态也。不衫不<ruby>履<rt>lǚ</rt></ruby>，旁若无人，此狂态也。坐立自如，问答随意，此<ruby>疏<rt>shū</rt></ruby>懒态也。饰其中机，不<ruby>苟<rt>gǒu</rt></ruby>言笑，察言观色，趋吉避凶，此周旋态也。皆根其性，不由<ruby>矫<rt>jiǎo</rt></ruby>枉。弱而不媚，狂而不<ruby>哗<rt>huā</rt></ruby>，<ruby>疏<rt>shū</rt></ruby>懒而真诚，周旋而健举，皆能成器；反此，<ruby>败<rt>bài</rt></ruby>类也。大概亦得二三矣。</p><p>前者恒态，亦有时态。方与对谈，神忽他往；众方称言，此独冷笑；深险难近，不足与论情。言不必当，极口称是；未交此人，故意<ruby>诋<rt>dǐ</rt></ruby><ruby>毁<rt>huǐ</rt></ruby>；卑庸可耻，不足与论事。漫无可否，临事迟回；不甚关情，亦为<ruby>堕<rt>duò</rt></ruby>泪；愚昧之仁，不足与谈心。三者不必定人终身。反此以求，可以交天下士。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">容貌者，骨之余，常佐骨之不足。</div><div class="tr">容貌是骨相的延伸，常常用来弥补骨相的不足。</div></div><div class="srow"><div class="src">情态者，神之余，常佐神之不足。</div><div class="tr">情态是精神的延伸，常常用来弥补精神的不足。</div></div><div class="srow"><div class="src">久注观人精神，乍见观人情态。</div><div class="tr">长时间注视一个人，看的是他的精神；初次见面一瞥之间，看的是他的情态。</div></div><div class="srow"><div class="src">大家举止，<ruby>羞<rt>xiū</rt></ruby><ruby>涩<rt>sè</rt></ruby>亦佳；小儿行藏，跳叫愈失。</div><div class="tr">大家风范的人即便羞涩也是好的；小儿做派的人越蹦跳叫嚷越显得失格。</div></div><div class="srow"><div class="src">大旨亦辨清<ruby>浊<rt>zhuó</rt></ruby>，细处兼论取舍。</div><div class="tr">大致上也是分辨清浊，细节处则要兼顾取舍。</div></div><div class="srow"><div class="src">人有弱态，有狂态，有<ruby>疏<rt>shū</rt></ruby>懒态，有周旋态。</div><div class="tr">人的情态有四种：柔弱之态、狂放之态、疏懒之态、周旋之态。</div></div><div class="srow"><div class="src">飞鸟依人，情致<ruby>婉<rt>wǎn</rt></ruby>转，此弱态也。</div><div class="tr">像飞鸟依偎着人一般，情意婉转动人——这是柔弱之态。</div></div><div class="srow"><div class="src">不衫不<ruby>履<rt>lǚ</rt></ruby>，旁若无人，此狂态也。</div><div class="tr">衣衫不整不修边幅，旁若无人——这是狂放之态。</div></div><div class="srow"><div class="src">坐立自如，问答随意，此<ruby>疏<rt>shū</rt></ruby>懒态也。</div><div class="tr">坐立随意自在，问答漫不经心——这是疏懒之态。</div></div><div class="srow"><div class="src">饰其中机，不<ruby>苟<rt>gǒu</rt></ruby>言笑，察言观色，趋吉避凶，此周旋态也。</div><div class="tr">内藏机心，不轻易言笑，察言观色，趋吉避凶——这是周旋之态。</div></div><div class="srow"><div class="src">皆根其性，不由<ruby>矫<rt>jiǎo</rt></ruby>枉。</div><div class="tr">这四种情态都根植于人的本性，不是刻意矫揉造作而成的。</div></div><div class="srow"><div class="src">弱而不媚，狂而不<ruby>哗<rt>huā</rt></ruby>，<ruby>疏<rt>shū</rt></ruby>懒而真诚，周旋而健举，皆能成器；</div><div class="tr">柔弱而不谄媚，狂放而不喧哗，疏懒却真诚，周旋却刚健有力——具备这些品质的人都能成器；</div></div><div class="srow"><div class="src">反此，<ruby>败<rt>bài</rt></ruby>类也。</div><div class="tr">与此相反的，就是败类了。</div></div><div class="srow"><div class="src">大概亦得二三矣。</div><div class="tr">大概也能看准十分之二三。</div></div><div class="srow"><div class="src">前者恒态，亦有时态。</div><div class="tr">前面说的是恒常的情态，此外还有一时的情态。</div></div><div class="srow"><div class="src">方与对谈，神忽他往；众方称言，此独冷笑；深险难近，不足与论情。</div><div class="tr">正和人交谈时，眼神忽然飘到他处；众人正热烈讨论时，唯独此人冷笑——这种人心机深沉险恶难以接近，不值得与之谈论情谊。</div></div><div class="srow"><div class="src">言不必当，极口称是；未交此人，故意<ruby>诋<rt>dǐ</rt></ruby><ruby>毁<rt>huǐ</rt></ruby>；卑庸可耻，不足与论事。</div><div class="tr">别人的话未必对，却极力附和；还没交往就故意诋毁别人——这种人卑鄙平庸可耻，不值得与之谈论正事。</div></div><div class="srow"><div class="src">漫无可否，临事迟回；不甚关情，亦为<ruby>堕<rt>duò</rt></ruby>泪；愚昧之仁，不足与谈心。</div><div class="tr">对什么事都不表态，遇到事情犹豫不决；与己无关的事也假装流泪——这种愚昧的假仁慈，不值得与之谈心。</div></div><div class="srow"><div class="src">三者不必定人终身。</div><div class="tr">这三种一时之情，不必然决定一个人的终身。</div></div><div class="srow"><div class="src">反此以求，可以交天下士。</div><div class="tr">与这三种相反的——专注交谈、不随波附和诋毁、遇事果断有真情——这样的人，可以结交天下之士。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>骨之余</b>　容貌是骨相的余脉延伸。</li><li><b>神之余</b>　情态是精神的余脉延伸。</li><li><b>久注</b>　长时间注视观察。</li><li><b>乍见</b>　初次见面一瞥之间。</li><li><b>弱态</b>　柔弱婉转的情态。</li><li><b>狂态</b>　狂放不羁的情态。</li><li><b>疏懒态</b>　疏懒随意的情态。</li><li><b>周旋态</b>　周旋应变的情态——内心藏机，察言观色。</li><li><b>恒态</b>　恒常的情态——根于本性。</li><li><b>时态</b>　一时的情态——临时表现。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇主题：情态——动态的神情与举止。</p><p>第一段立框架：容貌是骨之余，情态是神之余。久注观精神，乍见观情态。大家举止即使羞涩也是好的，小儿做派越跳叫越失格——关键在分辨清浊，细节处论取舍。</p><p>第二段论四种恒态：弱态、狂态、疏懒态、周旋态。飞鸟依人情致婉转为弱态；不衫不履旁若无人为狂态；坐立自如问答随意为疏懒态；饰其中机不苟言笑察言观色为周旋态。四种都根于本性，不由矫揉。</p><p>关键句解读：「弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器；反此，败类也。」——曾国藩的关键不在有没有某种态，而在有没有「度」。柔弱可以但不能谄媚，狂放可以但不能喧哗，疏懒可以但要真诚，周旋可以但要健举。有态有度则成器，有态无度则败类。</p><p>第三段论三种时态：方与对谈而神忽他往者——深险难近；极口称是而故意诋毁者——卑庸可耻；漫无可否临事迟回者——愚昧之仁。这三种不必定终身，但「反此以求，可以交天下士」——专注、正直、果断，便是可交之士。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《论语·乡党</span><span class="jzpass">孔子于乡党，恂恂如也，似不能言者。其在宗庙朝廷，便便言，唯谨尔。</span><span class="jznote">孔子在不同场合情态不同——恒态与时态之辨。</span></li><li><span class="jzbook">《人物志·材理</span><span class="jzpass">观其志之所趣，则其材之所及，亦可知也。</span><span class="jznote">刘劭论从情态志趣观人——与曾国藩情态论相通。</span></li><li><span class="jzbook">《世说新语·雅量</span><span class="jzpass">谢太傅盘桓东山时，与孙兴公诸人泛海戏。既受风涛，诸人并色变，公神貌全不起。</span><span class="jznote">谢安之情态——大家举止，虽临危而安。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器」——曾国藩告诉我们：性格类型没有好坏，关键是有没有「度」。柔的人不谄媚就是好品质，刚的人不喧哗就是好品质。不是要你改性格，而是要你在自己性格的边界上守好「度」。这比让你「变成另一种人」现实得多。你是什么态？弱、狂、疏懒还是周旋？你的「度」守得好不好？</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇论情态——从静态容貌到动态举止。读时注意三层递进：① 情态与精神的关系（神之余，佐神之不足）→ ② 四种恒态（弱/狂/疏懒/周旋，根于本性，贵在有度）→ ③ 三种时态（神忽他往/极口称是/漫无可否，不必定终身，反此可交天下士）。核心：有态有度则成器，有态无度则败类。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你属于弱态、狂态、疏懒态还是周旋态？你的「度」守得好吗？</li><li>你有没有「神忽他往」「漫无可否」的时态？身边有这样的人吗？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-4">0</span> 字</label><textarea class="sheng-note" id="shengNote-4" data-n="4" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+  <article class="chapter view" id="ch-5" data-chapter="5" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">五</span>
+      <div><h2>第五章</h2><p class="lab">须眉</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="5" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>须眉男子。未有须眉不具，可称男子者。少年两道眉，临老一林须。此言眉主早成，须主晚运也。然而，紫面无眉自贵，暴腮缺须亦荣。郭令公半部不全，霍剽姚一副寡脸。此等间逢。毕竟有须眉者十之九也。</p><p>眉尚彩，彩者，<ruby>杪<rt>miǎo</rt></ruby>处反光是也。贵人有三层彩，有一二层彩者，所谓文明气象。宜<ruby>疏<rt>shū</rt></ruby>爽不宜<ruby>凝<rt>níng</rt></ruby>滞，一望有乘风翔舞之势者，上也；如<ruby>泼<rt>pō</rt></ruby>墨者，最下。倒竖者，上也；下垂者，最下。长有起伏，短有神气，浓忌浮光，淡忌枯索。如剑者掌兵权，如帚者赴法场。个中亦有微茫，不可不辨。他如压眼不利，散乱多忧，细而带媚，粗而无文，最是下乘。</p><p>须有多寡，取其与眉相称。多者宜清、宜<ruby>疏<rt>shū</rt></ruby>、宜缩、宜参差不齐；少者宜健、宜光、宜圆、宜有情照顾。卷如螺纹，聪明<ruby>豁<rt>huò</rt></ruby>达；长如解索，风流荣显；劲如张<ruby>戟<rt>jǐ</rt></ruby>，位高权重；亮若银条，早登廊庙。皆官途大器。紫须剑眉，声音<ruby>洪<rt>hóng</rt></ruby>壮；蓬然虬乱，尝见耳后；配以神骨清奇，不千里封侯，亦十年拜相。他如辅须先长终不利，人中不见一世穷，鼻毛接须多<ruby>晦<rt>huì</rt></ruby>滞，短<ruby>髭<rt>zī</rt></ruby>遮口饿终身，此其显可见矣。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">须眉男子。未有须眉不具，可称男子者。</div><div class="tr">须眉是男子的标志。没有须眉不具备，却可以称为男子汉的。</div></div><div class="srow"><div class="src">少年两道眉，临老一林须。此言眉主早成，须主晚运也。</div><div class="tr">少年看两道眉毛，老年看一部胡须。这是说眉毛主管早年的成就，胡须主管晚年的运程。</div></div><div class="srow"><div class="src">然而，紫面无眉自贵，暴腮缺须亦荣。</div><div class="tr">然而也有例外：面色紫红没有眉毛的人自然显贵，腮帮外翻缺少胡须的人也能荣耀。</div></div><div class="srow"><div class="src">郭令公半部不全，霍剽姚一副寡脸。此等间逢。</div><div class="tr">郭子仪半部须眉不全，霍去病一副寡脸——这类情况偶尔也能遇到。</div></div><div class="srow"><div class="src">毕竟有须眉者十之九也。</div><div class="tr">毕竟有须有眉的人还是十之八九。</div></div><div class="srow"><div class="src">眉尚彩，彩者，<ruby>杪<rt>miǎo</rt></ruby>处反光是也。</div><div class="tr">眉毛崇尚有「彩」——所谓彩，是指眉毛末梢处泛着光泽反光。</div></div><div class="srow"><div class="src">贵人有三层彩，有一二层彩者，所谓文明气象。</div><div class="tr">贵人有三层光彩，有一两层光彩的人，就是所谓的文明气象。</div></div><div class="srow"><div class="src">宜<ruby>疏<rt>shū</rt></ruby>爽不宜<ruby>凝<rt>níng</rt></ruby>滞，一望有乘风翔舞之势者，上也；如<ruby>泼<rt>pō</rt></ruby>墨者，最下。</div><div class="tr">眉毛宜疏朗爽快不宜浓暗凝滞——一眼望去有乘风飞舞之势的是上品；像泼了墨一样的是最下等。</div></div><div class="srow"><div class="src">倒竖者，上也；下垂者，最下。</div><div class="tr">眉毛倒竖向上的是上品；眉毛下垂的是最下等。</div></div><div class="srow"><div class="src">长有起伏，短有神气，浓忌浮光，淡忌枯索。</div><div class="tr">长的眉毛要有起伏变化，短的眉毛要有精神气度；浓眉忌讳泛着油光，淡眉忌讳干枯如柴。</div></div><div class="srow"><div class="src">如剑者掌兵权，如帚者赴法场。</div><div class="tr">眉毛像利剑的人掌管兵权，眉毛像扫帚的人要上法场。</div></div><div class="srow"><div class="src">个中亦有微茫，不可不辨。</div><div class="tr">这其中的差别也很微妙，不能不仔细分辨。</div></div><div class="srow"><div class="src">他如压眼不利，散乱多忧，细而带媚，粗而无文，最是下乘。</div><div class="tr">其他如眉毛压住眼睛则不利，眉毛散乱则多忧愁，眉毛细而带媚态、粗而无文采——都是最下等的眉相。</div></div><div class="srow"><div class="src">须有多寡，取其与眉相称。</div><div class="tr">胡须有多有少，关键在于与眉毛相称。</div></div><div class="srow"><div class="src">多者宜清、宜<ruby>疏<rt>shū</rt></ruby>、宜缩、宜参差不齐；</div><div class="tr">胡须多的宜清爽、宜疏朗、宜收敛、宜参差不齐；</div></div><div class="srow"><div class="src">少者宜健、宜光、宜圆、宜有情照顾。</div><div class="tr">胡须少的宜挺健、宜光润、宜圆润、宜与面部有情意照应。</div></div><div class="srow"><div class="src">卷如螺纹，聪明<ruby>豁<rt>huò</rt></ruby>达；长如解索，风流荣显；</div><div class="tr">胡须卷曲如螺丝纹的人聪明豁达；胡须长如解开的绳索般飘逸的人风流显达；</div></div><div class="srow"><div class="src">劲如张<ruby>戟<rt>jǐ</rt></ruby>，位高权重；亮若银条，早登廊庙。</div><div class="tr">胡须刚劲如张开的戟的人位高权重；胡须亮如银条的人早早登上朝廷。</div></div><div class="srow"><div class="src">皆官途大器。</div><div class="tr">这些都是官场中的大器之才。</div></div><div class="srow"><div class="src">紫须剑眉，声音<ruby>洪<rt>hóng</rt></ruby>壮；蓬然虬乱，尝见耳后；</div><div class="tr">紫色胡须配剑形眉、声音洪亮雄壮；胡须蓬松卷曲，甚至长到耳后——</div></div><div class="srow"><div class="src">配以神骨清奇，不千里封侯，亦十年拜相。</div><div class="tr">再配上清奇的神骨，即使不能封侯千里，也能十年之内拜相。</div></div><div class="srow"><div class="src">他如辅须先长终不利，人中不齐一世穷，鼻毛接须多<ruby>晦<rt>huì</rt></ruby>滞，短<ruby>髭<rt>zī</rt></ruby>遮口饿终身，此其显可齐矣。</div><div class="tr">其他如辅须比主须先长终究不利，人中看不见一辈子受穷，鼻毛连着胡须多有晦气阻滞，短髭遮住嘴巴终身挨饿——这些都是显而易见的。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>须眉男子</b>　胡须眉毛是男子的标志。</li><li><b>眉主早成</b>　眉毛主管早年成就——少年两道眉。</li><li><b>须主晚运</b>　胡须主管晚年运程——临老一林须。</li><li><b>彩</b>　眉毛末梢处泛着光泽反光——眉之精华。</li><li><b>三层彩</b>　贵人有三层光彩——眉之极贵者。</li><li><b>文明气象</b>　有一二层光彩的眉——有文采修养之相。</li><li><b>乘风翔舞</b>　眉毛如乘风飞舞之势——眉之最佳形态。</li><li><b>泼墨</b>　眉毛如泼墨般浓黑凝滞——眉之最差形态。</li><li><b>如剑</b>　眉如利剑——主掌兵权。</li><li><b>如帚</b>　眉如扫帚——主赴法场，凶相。</li><li><b>螺纹</b>　胡须卷曲如螺丝纹——主聪明豁达。</li><li><b>解索</b>　胡须长如解开的绳索——主风流荣显。</li><li><b>张戟</b>　胡须刚劲如张开的戟——主权高位重。</li><li><b>廊庙</b>　朝廷——早登廊庙即早早入朝为官。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇主题：须眉——胡须与眉毛的相法。</p><p>第一段论须眉与运势：少年看眉，老来看须。眉主早成，须主晚运。但也有例外——紫面无眉自贵、暴腮缺须亦荣，郭子仪半部不全、霍去病一副寡脸——这类情况偶尔有之。</p><p>第二段论眉之相：眉尚「彩」——末梢反光为彩。贵人有三层彩，一二层为文明气象。眉宜疏爽不宜凝滞，一望有乘风翔舞之势为上品，如泼墨为最下。倒竖为上，下垂为最下。长有起伏、短有神气；浓忌浮光、淡忌枯索。眉如剑掌兵权，如帚赴法场。</p><p>关键句解读：「贵人有三层彩」——眉毛的光泽层次反映贵的程度。这不是看眉毛的浓淡粗细，而是看眉毛的「神彩」——有没有光泽、有没有气势。浓而不亮、粗而无形都是下乘。</p><p>第三段论须之相：须有多寡，取其与眉相称。多者宜清疏缩参差，少者宜健光圆有情。卷如螺纹聪明豁达，长如解索风流荣显，劲如张戟位高权重，亮若银条早登廊庙。</p><p>末段论凶相：辅须先长不利、人中不见一世穷、鼻毛接须多晦滞、短髭遮口饿终身——这些都是显而易见的穷厄之相。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《史记·留侯世家</span><span class="jzpass">高帝曰：夫运筹策帷帐之中，决胜于千里之外，吾不如子房。余以为其人必魁梧奇伟，至见其图，状貌如妇人好女。</span><span class="jznote">张良貌如女子——却有帝王之师之才，可见相不可以一端论。</span></li><li><span class="jzbook">《汉书·霍去病传</span><span class="jzpass">霍去病年十八为侍中，善骑射。</span><span class="jznote">霍去病年少功高——一副寡脸亦荣。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「眉尚彩」「取其与眉相称」——曾国藩观眉观须，核心是「光彩」和「相称」。眉毛有光泽说明精神饱满，须眉相称说明整体协调。这不是迷信，而是健康和精神状态的反映。一个人精神好，眉毛自然有光；一个人整体协调，须眉自然相称。反过来说，如果你最近眉毛暗淡、精神不济——不是去纹眉，而是去调整作息、恢复精神。外在是内在的镜子。</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇论须眉——眉主早运，须主晚运。读时注意：① 须眉与运势的总关系（少年看眉，老来看须）→ ② 眉之贵贱（彩、疏爽、乘风翔舞 vs 泼墨、下垂）→ ③ 须之贵贱（与眉相称、螺纹/解索/张戟/银条）→ ④ 凶相列举。核心：光彩与相称——不是看浓淡粗细，而是看精神气度。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你的「光彩」如何？精神饱满还是暗淡无光？</li><li>你整体「相称」吗？有没有某一处特别不协调？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-5">0</span> 字</label><textarea class="sheng-note" id="shengNote-5" data-n="5" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+  <article class="chapter view" id="ch-6" data-chapter="6" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">六</span>
+      <div><h2>第六章</h2><p class="lab">声音</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="6" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>人之声音，犹天地之气，轻清上浮，重<ruby>浊<rt>zhuó</rt></ruby>下坠。始于丹田，发于喉，转于舌，辨于齿，出于唇，实与五音相配。取其自成一家，不必一一合调。闻声相思，其人斯在，宁必一见决雌雄哉。</p><p>声与音不同。声主张，寻发处见；音主敛，寻歇处见。辨声之法，必辨喜怒哀乐。喜如折竹当风，怒如阴雷起地，哀如石击薄冰，乐如雪舞风前，大概以轻清为上。声雄者，如<ruby>钟<rt>zhōng</rt></ruby>则贵，如锣则贱；声雌者，如<ruby>雉<rt>zhì</rt></ruby>鸣则贵，如<ruby>蛙<rt>wā</rt></ruby>鸣则贱。远听声<ruby>洪<rt>hóng</rt></ruby>，近听悠<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，起若乘风，止若拍瑟，上上；大言不张唇，细言若无齿，上也。出而不返，荒郊牛鸣；急而不达，深夜鼠<ruby>嚼<rt>jiáo</rt></ruby>；或字句相联，喋喋利口；或齿喉隔断，<ruby>喈<rt>jiē</rt></ruby><ruby>喈<rt>jiē</rt></ruby>混谈；市井之夫，何足比数。</p><p>音者，声之余也，与声相去不远，此则从细处曲中见直。贫贱者有声无音，尖巧者有音无声，所谓禽无声、兽无音是也。凡人说话是声，其散在左右前后是音。开谈若含情，话终多余响，不惟雅人，兼称<ruby class="tj" title="一国之中杰出的人才——不仅文雅而且厚重。">国士<rt>guó shì</rt></ruby>；阔口无<ruby>溢<rt>yì</rt></ruby>出，尖舌无<ruby class="tj" title="通「佻」，轻佻、不实。「尖舌无窕音」即发音不轻佻。">窕<rt>tiǎo</rt></ruby>音，不惟实厚，兼获名高。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">人之声音，犹天地之气，轻清上浮，重<ruby>浊<rt>zhuó</rt></ruby>下坠。</div><div class="tr">人的声音好比天地间的气：轻而清的上升浮越，重而浊的下降沉坠。</div></div><div class="srow"><div class="src">始于丹田，发于喉，转于舌，辨于齿，出于唇，实与五音相配。</div><div class="tr">声音从丹田发出起始，经过喉咙发声，在舌头上转换，在牙齿间分辨，从嘴唇间吐出——实际上与宫商角徵羽五音相配。</div></div><div class="srow"><div class="src">取其自成一家，不必一一合调。</div><div class="tr">听声取其自成一种风格即可，不必要求每个音都合乎标准调式。</div></div><div class="srow"><div class="src">闻声相思，其人斯在，宁必一见决雌雄哉。</div><div class="tr">听到声音就能想见其人的模样——何必要见面才能分出高下呢？</div></div><div class="srow"><div class="src">声与音不同。声主张，寻发处见；音主敛，寻歇处见。</div><div class="tr">声和音不同。声主张扬，从发声之处去寻见；音主收敛，从声音止息之处去寻见。</div></div><div class="srow"><div class="src">辨声之法，必辨喜怒哀乐。</div><div class="tr">辨别声的方法，必须从喜怒哀乐四种情绪来分辨。</div></div><div class="srow"><div class="src">喜如折竹当风，怒如阴雷起地，哀如石击薄冰，乐如雪舞风前，大概以轻清为上。</div><div class="tr">喜悦时声如风中折竹般清脆，愤怒时声如地下闷雷般沉雄，悲哀时声如石击薄冰般碎裂，欢乐时声如风中飞雪般飘洒——大致以轻清为上品。</div></div><div class="srow"><div class="src">声雄者，如<ruby>钟<rt>zhōng</rt></ruby>则贵，如锣则贱；声雌者，如<ruby>雉<rt>zhì</rt></ruby>鸣则贵，如<ruby>蛙<rt>wā</rt></ruby>鸣则贱。</div><div class="tr">雄壮的声如铜钟则贵，如铜锣则贱；柔和的声如野鸡鸣叫则贵，如蛙叫则贱。</div></div><div class="srow"><div class="src">远听声<ruby>洪<rt>hóng</rt></ruby>，近听悠<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，起若乘风，止若拍瑟，上上；</div><div class="tr">远处听声洪亮，近处听声悠扬，起声时像乘风而上，止声时像拍击瑟弦般干净——这是上上之品；</div></div><div class="srow"><div class="src">大言不张唇，细言若无齿，上也。</div><div class="tr">大声说话时嘴唇不怎么张开，小声说话时像没有牙齿般含蓄——这也是上品。</div></div><div class="srow"><div class="src">出而不返，荒郊牛鸣；急而不达，深夜鼠<ruby>嚼<rt>jiáo</rt></ruby>；</div><div class="tr">声音发出去收不回来，像荒野中的牛鸣；声音急促而不通达，像深夜老鼠嚼东西；</div></div><div class="srow"><div class="src">或字句相联，喋喋利口；或齿喉隔断，<ruby>喈<rt>jiē</rt></ruby><ruby>喈<rt>jiē</rt></ruby>混谈；市井之夫，何足比数。</div><div class="tr">或者字句连成一片，喋喋不休只是嘴快；或者齿喉发音断隔，含混不清——这些都是市井之徒，不值一提。</div></div><div class="srow"><div class="src">音者，声之余也，与声相去不远，此则从细处曲中见直。</div><div class="tr">音是声的余韵，与声相差不远，但它从细微之处曲折地反映出一个人的真实品性。</div></div><div class="srow"><div class="src">贫贱者有声无音，尖巧者有音无声，所谓禽无声、兽无音是也。</div><div class="tr">贫贱的人有声却没有余音，尖滑巧诈的人有余音却没有正声——这就是所谓的飞禽无声、走兽无音。</div></div><div class="srow"><div class="src">凡人说话是声，其散在左右前后是音。</div><div class="tr">大凡人说话发出的就是声，而散布在四周的余韵就是音。</div></div><div class="srow"><div class="src">开谈若含情，话终多余响，不惟雅人，兼称<ruby class="tj" title="一国之中杰出的人才——不仅文雅而且厚重。">国士<rt>guó shì</rt></ruby>；</div><div class="tr">一开口说话就含着情意，话说完了还有余韵回响——不仅是高雅之人，更堪称国士；</div></div><div class="srow"><div class="src">阔口无<ruby>溢<rt>yì</rt></ruby>出，尖舌无<ruby class="tj" title="通「佻」，轻佻、不实。「尖舌无窕音」即发音不轻佻。">窕<rt>tiǎo</rt></ruby>音，不惟实厚，兼获名高。</div><div class="tr">嘴阔但说话不溢散，舌尖但发音不含混——不仅为人厚实，还能获得高名。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>丹田</b>　脐下三寸——声音发源之处。</li><li><b>五音</b>　宫商角徵羽——五声音阶，对应五脏五行。</li><li><b>声</b>　声主张——从发声之处寻见。</li><li><b>音</b>　音主敛——从声音止息之处寻见，即余韵。</li><li><b>折竹当风</b>　喜悦之声如风中折竹——清脆悦耳。</li><li><b>阴雷起地</b>　愤怒之声如地下闷雷——沉雄有力。</li><li><b>石击薄冰</b>　悲哀之声如石击薄冰——清碎欲裂。</li><li><b>雪舞风前</b>　欢乐之声如风中飞雪——飘洒轻扬。</li><li><b>声雄</b>　雄壮之声——如钟为贵，如锣为贱。</li><li><b>声雌</b>　柔和之声——如雉鸣为贵，如蛙鸣为贱。</li><li><b>拍瑟</b>　止声如拍击瑟弦般干净利落。</li><li><b>国士</b>　国之栋梁之才——不仅雅而且厚重。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇主题：声音——声与音的分别与贵贱。</p><p>第一段论声音之理：人之声音犹天地之气，轻清上浮重浊下坠。声始于丹田，经喉、舌、齿、唇而出，与五音相配。关键在「取其自成一家，不必一一合调」——不要求标准音，而要求独特风格。</p><p>关键句解读：「闻声相思，其人斯在，宁必一见决雌雄哉」——听到声音就能想见其人，不必见面就能判断。这说明声音比外貌更能反映一个人的本质。</p><p>第二段论声与音的分别：声主张，从发处见；音主敛，从歇处见。辨声必辨喜怒哀乐：喜如折竹当风，怒如阴雷起地，哀如石击薄冰，乐如雪舞风前——以轻清为上。声雄如钟则贵如锣则贱；声雌如雉鸣则贵如蛙鸣则贱。</p><p>第三段论音：音是声之余韵。贫贱者有声无音，尖巧者有音无声——禽无声兽无音。开谈含情、话终余响者——不仅雅人，兼称国士。阔口不溢出、尖舌无窕音者——不仅实厚，兼获名高。</p><p>关键句解读：「贫贱者有声无音，尖巧者有音无声」——有声无音是底气不足（贫贱），有音无声是虚浮无根（尖巧）。声与音都有、都正——才是大器。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《礼记·乐记</span><span class="jzpass">凡音之起，由人心生也。人心之动，物使之然也。</span><span class="jznote">声音源于人心——与曾国藩声音论同源。</span></li><li><span class="jzbook">《史记·司马相如列传</span><span class="jzpass">相如口吃而善著书。</span><span class="jznote">口吃不妨善著书——声不美未必才不足，但声音确为观人之要。</span></li><li><span class="jzbook">《世说新语·赏誉</span><span class="jzpass">王戎曰：太保神姿高彻，如瑶林琼树，自然是风尘外物。</span><span class="jznote">风姿之外，声音亦是判人风骨之要。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「闻声相思，其人斯在」——声音是人的第二张脸。打电话、语音消息、视频会议——在这个不见面就能交流的时代，声音比任何时候都重要。你的声音是轻清上浮还是重浊下坠？说话有没有底气、有没有余韵？「开谈若含情，话终多余响」——说话有真情、说完了还有余味，这样的人不仅让人觉得舒服，更让人觉得靠谱。声音是可以练的：放慢语速、深呼吸用丹田发声、说话有始有终。</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇论声音——声与音的分别。读时注意：① 声音之理（轻清上浮重浊下坠，始于丹田出唇）→ ② 声之辨（喜怒哀乐各有声，如钟/锣/雉/蛙）→ ③ 音之辨（声之余韵，有声无音为贫贱，有音无声为尖巧）。核心：「闻声相思，其人斯在」——声音比外貌更能反映本质。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你的声音是轻清上浮还是重浊下坠？有没有余韵？</li><li>你说话「开谈含情、话终余响」吗？还是话一说完就断？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-6">0</span> 字</label><textarea class="sheng-note" id="shengNote-6" data-n="6" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+  <article class="chapter view" id="ch-7" data-chapter="7" data-view="ch">
+    <div class="ch-head"><span class="seal seal-lg">七</span>
+      <div><h2>第七章</h2><p class="lab">气色</p></div>
+      <span class="spacer"></span>
+      <button class="btn ghost share-btn" data-n="7" title="复制本章链接，分享给书友即可直达本章">分享本章</button></div>
+    <div class="ch-text"><p>面部如命，气色如运。大命固宜整齐，小运亦当亨泰。是故光焰不发，珠玉与瓦砾同观；藻绘未<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，<ruby>缯<rt>zēng</rt></ruby>帛与布<ruby>葛<rt>gé</rt></ruby>齐价。大者主一生祸福，小者亦三月吉凶。</p><p>人以气为主，于内为精神，于外为气色。有终身之气色，少淡、长明、壮<ruby>艳<rt>yàn</rt></ruby>、老素是也。有一年之气色，春青、夏红、秋黄、冬白是也。有一月之气色，<ruby>朔<rt>shuò</rt></ruby>后森发，望后隐<ruby>跃<rt>yuè</rt></ruby>是也。有一日之气色，早透、昼满、晚停、暮静是也。</p><p>科名中人，以黄色为主，此正色也。黄云盖顶，必<ruby>掇<rt>duō</rt></ruby>大<ruby>魁<rt>kuí</rt></ruby>；黄翅入<ruby>鬓<rt>bìn</rt></ruby>，进身不远；<ruby>印<rt>yìn</rt></ruby><ruby>堂<rt>táng</rt></ruby>黄色，富贵逼人；学<ruby>堂<rt>táng</rt></ruby>紫净，明年及第。他如眼角霞鲜，决利小考；<ruby>印<rt>yìn</rt></ruby><ruby>堂<rt>táng</rt></ruby>垂紫，动获小利；红<ruby>晕<rt>yùn</rt></ruby>中分，定产佳儿；两<ruby>颧<rt>quán</rt></ruby>红润，骨肉发迹。由此推之，足见一斑矣。</p><p>色忌白、忌青。青常见于眼底，白常发于眉端。然亦有不同。心事忧劳，青如<ruby>凝<rt>níng</rt></ruby>墨；祸生不测，青如浮烟；酒色<ruby>惫<rt>bèi</rt></ruby>倦，白如卧羊；灾<ruby>晦<rt>huì</rt></ruby>催人，白如<ruby class="tj" title="通「敷」，涂抹。「白如傅粉」即白如涂了粉。">傅<rt>fù</rt></ruby>粉。又或青而带紫，金形遇之而飞<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>；白而有光，土庚相当亦富贵；又不在此论也。最不佳者，太白夹日月，乌鸟集天庭，桃花散面<ruby>颊<rt>jiá</rt></ruby>，<ruby class="tj" title="读 chēng，赤红色。「赬尾守地阁」即赤红色守住下巴。">赬<rt>chēng</rt></ruby>尾守地阁。有一于此，前程退落，祸患再三矣。</p></div>
+    <div class="ch-foot"><a href="#toc">回到目录</a></div>
+    <div class="det">
+      <div class="det-label">本章详解</div>
+      <div class="tabs" role="tablist"><button class="tab-btn active" data-tab="yi">译文</button><button class="tab-btn" data-tab="zhu">注释</button><button class="tab-btn" data-tab="chuan">串讲</button><button class="tab-btn" data-tab="jiedu">解读</button><button class="tab-btn" data-tab="dao">导读</button><button class="tab-btn" data-tab="sheng">省察</button></div>
+      <div class="panels"><div class="panel active" data-panel="yi"><div class="sentences"><div class="srow"><div class="src">面部如命，气色如运。</div><div class="tr">面相好比一个人的命，气色好比一个人的运。</div></div><div class="srow"><div class="src">大命固宜整齐，小运亦当亨泰。</div><div class="tr">大命固然应当齐整稳定，小运也应当通达顺遂。</div></div><div class="srow"><div class="src">是故光焰不发，珠玉与瓦砾同观；藻绘未<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>，<ruby>缯<rt>zēng</rt></ruby>帛与布<ruby>葛<rt>gé</rt></ruby>齐价。</div><div class="tr">所以光芒不绽放，珠玉和瓦砾看起来一样；色彩不彰显，丝绸和粗布卖一样的价。</div></div><div class="srow"><div class="src">大者主一生祸福，小者亦三月吉凶。</div><div class="tr">大命主宰一生的祸福，小运也主宰三个月的吉凶。</div></div><div class="srow"><div class="src">人以气为主，于内为精神，于外为气色。</div><div class="tr">人以气为根本：在内表现为精神，在外表现为气色。</div></div><div class="srow"><div class="src">有终身之气色，少淡、长明、壮<ruby>艳<rt>yàn</rt></ruby>、老素是也。</div><div class="tr">有一生的气色规律：少年时淡雅，青壮年时明亮，壮年时浓艳，老年时素净。</div></div><div class="srow"><div class="src">有一年之气色，春青、夏红、秋黄、冬白是也。</div><div class="tr">有一年的气色规律：春季偏青，夏季偏红，秋季偏黄，冬季偏白。</div></div><div class="srow"><div class="src">有一月之气色，<ruby>朔<rt>shuò</rt></ruby>后森发，望后隐<ruby>跃<rt>yuè</rt></ruby>是也。</div><div class="tr">有一个月的气色规律：初一之后生气勃发，十五之后渐渐隐伏。</div></div><div class="srow"><div class="src">有一日之气色，早透、昼满、晚停、暮静是也。</div><div class="tr">有一日的气色规律：早晨透发，白天充盈，傍晚渐停，入夜安静。</div></div><div class="srow"><div class="src">科名中人，以黄色为主，此正色也。</div><div class="tr">求取功名的人，气色以黄色为主——这是正色。</div></div><div class="srow"><div class="src">黄云盖顶，必<ruby>掇<rt>duō</rt></ruby>大<ruby>魁<rt>kuí</rt></ruby>；黄翅入<ruby>鬓<rt>bìn</rt></ruby>，进身不远；</div><div class="tr">黄色如云盖住头顶，必定能高中榜首；黄色如翅延伸入鬓角，升官之日不远；</div></div><div class="srow"><div class="src"><ruby>印<rt>yìn</rt></ruby><ruby>堂<rt>táng</rt></ruby>黄色，富贵逼人；学<ruby>堂<rt>táng</rt></ruby>紫净，明年及第。</div><div class="tr">印堂处呈黄色，富贵逼人来；学堂部位紫而洁净，明年就能及第。</div></div><div class="srow"><div class="src">他如眼角霞鲜，决利小考；<ruby>印<rt>yìn</rt></ruby><ruby>堂<rt>táng</rt></ruby>垂紫，动获小利；</div><div class="tr">其他如眼角如霞光般鲜亮，必定有利于小考；印堂垂下紫色，动辄获得小利；</div></div><div class="srow"><div class="src">红<ruby>晕<rt>yùn</rt></ruby>中分，定产佳儿；两<ruby>颧<rt>quán</rt></ruby>红润，骨肉发迹。</div><div class="tr">鼻柱上有红晕分开，必定生好儿子；两边颴骨红润，亲人将会发迹。</div></div><div class="srow"><div class="src">由此推之，足见一斑矣。</div><div class="tr">由此推论，就可以看出大概了。</div></div><div class="srow"><div class="src">色忌白、忌青。青常见于眼底，白常发于眉端。</div><div class="tr">气色忌白色、忌青色。青色常出现在眼底，白色常出现在眉端。</div></div><div class="srow"><div class="src">然亦有不同。心事忧劳，青如<ruby>凝<rt>níng</rt></ruby>墨；祸生不测，青如浮烟；</div><div class="tr">但也不尽相同。因心事忧愁劳累而显青，青色如凝聚的浓墨；因不测之祸将临而显青，青色如飘浮的烟；</div></div><div class="srow"><div class="src">酒色<ruby>惫<rt>bèi</rt></ruby>倦，白如卧羊；灾<ruby>晦<rt>huì</rt></ruby>催人，白如<ruby class="tj" title="通「敷」，涂抹。「白如傅粉」即白如涂了粉。">傅<rt>fù</rt></ruby>粉。</div><div class="tr">因酒色过度疲倦而显白，白色如躺卧的羊；因灾祸晦气催逼而显白，白色如涂了粉。</div></div><div class="srow"><div class="src">又或青而带紫，金形遇之而飞<ruby class="tj" title="通「扬」，飞扬、振奋。「跳亦不扬」即跳动时也不能振奋。">扬</ruby>；白而有光，土庚相齐亦富贵；又不在此论也。</div><div class="tr">又或者青色中带紫色，金形人遇到这种气色反而飞黄腾达；白色中有光泽，土形人与庚金相当也主富贵——这些又不在忌讳之列。</div></div><div class="srow"><div class="src">最不佳者，太白夹日月，乌鸟集天庭，桃花散面<ruby>颊<rt>jiá</rt></ruby>，<ruby class="tj" title="读 chēng，赤红色。「赬尾守地阁」即赤红色守住下巴。">赬<rt>chēng</rt></ruby>尾守地阁。</div><div class="tr">最不好的气色是：太白之气夹住日月角，乌黑之气聚集在天庭，桃花般的红色散布在面颊，赤红色守住地阁下巴。</div></div><div class="srow"><div class="src">有一于此，前程退落，祸患再三矣。</div><div class="tr">只要出现一种，前程就会倒退衰落，祸患接踵而至。</div></div></div></div><div class="panel" data-panel="zhu"><ul class="zhu"><li><b>命与运</b>　面部如命——固定不变；气色如运——随时变化。</li><li><b>大命与小运</b>　大命主一生祸福，小运主三月吉凶。</li><li><b>终身气色</b>　一生的气色规律：少淡长明壮艳老素。</li><li><b>一年气色</b>　一年的气色规律：春青夏红秋黄冬白。</li><li><b>一月气色</b>　一月的气色规律：朔后森发望后隐跃。</li><li><b>一日气色</b>　一日的气色规律：早透昼满晚停暮静。</li><li><b>科名中人</b>　求取功名之人——气色以黄为主。</li><li><b>黄云盖顶</b>　黄色如云覆盖头顶——主大魁。</li><li><b>阴骘纹</b>　因阴德而显的纹路——主迟发而贵。</li><li><b>凝墨</b>　青色如浓墨凝聚——主心事忧劳。</li><li><b>浮烟</b>　青色如浮烟飘散——主不测之祸。</li><li><b>卧羊</b>　白色如卧着的羊——主酒色惫倦。</li><li><b>傅粉</b>　白色如涂了粉——主灾晦催人。</li><li><b>地阁</b>　下巴——相术面部十三部位之一。</li></ul></div><div class="panel" data-panel="chuan"><p>本篇主题：气色——面部色泽的变化规律。</p><p>第一段命理论：面部如命，气色如运。大命宜整齐，小运当亨泰。光焰不发则珠玉与瓦砾同观——气色不发则命再好也显不出来。大者主一生祸福，小者主三月吉凶。</p><p>第二段论四时气色：终身气色——少淡、长明、壮艳、老素；一年气色——春青、夏红、秋黄、冬白；一月气色——朔后森发、望后隐跃；一日气色——早透、昼满、晚停、暮静。这四层规律说明：气色是随时间变化的，不是固定不变的。</p><p>关键句解读：「人以气为主，于内为精神，于外为气色」——气是根本，在内表现为精神状态，在外表现为面部气色。气色好不好，本质上反映的是精神好不好。</p><p>第三段论科名气色：以黄为主——黄云盖顶必掇大魁，黄翅入鬓进身不远，印堂黄富贵逼人，学堂紫净明年及第。此外眼角霞鲜利小考，印堂垂紫获小利，红晕中分产佳儿，两颴红润骨肉发迹。</p><p>第四段论忌色：忌白忌青。青常见于眼底，白常发于眉端。但青白也有不同——心事忧劳则青如凝墨，祸生不测则青如浮烟，酒色惫倦则白如卧羊，灾晦催人则白如傅粉。最不佳者——太白夹日月、乌鸟集天庭、桃花散面颊、赬尾守地阁——有一于此则前程退落祸患再三。</p><div class="jzchain"><div class="jzhead">经证链 · 以经典解经典</div><ul class="jzlist"><li><span class="jzbook">《黄帝内经·素问</span><span class="jzpass">东方青色，入通于肝；南方赤色，入通于心。</span><span class="jznote">《内经》论五色与五脏相应——气色理论的医学基础。</span></li><li><span class="jzbook">《史记·高祖本纪</span><span class="jzpass">高祖为人，隆准而龙颜，美须髯，左股有七十二黑子。</span><span class="jznote">刘邦之相——面相气色兼论。</span></li><li><span class="jzbook">《人物志·九征</span><span class="jzpass">物生有形，形有神精。</span><span class="jznote">刘劭论形神——气色为神之外征。</span></li></ul></div></div><div class="panel" data-panel="jiedu"><div class="jiedu"><p class="jhint">学派/视角名称可点击，展开简介</p><div class="jrow"><button type="button" class="jlabel" aria-expanded="false">生活启发</button><div class="jbody"><span class="jbasis">所本：日用践履</span><div class="jintro">《冰鉴》讲的是「以神骨为先、以刚柔为辨、以容貌情态声音气色为辅」的观人之道。七篇从本体到外征、从静态到动态、从先天到后天层层展开——核心精神是：相由心生，观人即观心。</div><p>「人以气为主，于内为精神，于外为气色」——气色不好不是皮肤问题，是精神问题。熬夜、压力、焦虑——先伤精神，再显气色。面有青色多半心事忧劳，面有白色多半疲惫倦怠。与其化妆遮盖，不如调整作息、疏导情绪、恢复精神。曾国藩的气色论告诉我们：脸是心的镜子。你要脸色好，先要心气足。早睡早起、运动出汗、心态平和——比任何护肤品都有效。</p></div></div></div></div><div class="panel" data-panel="dao"><p>本篇是全书收束——气色是神骨、刚柔、容貌、情态、须眉、声音六篇的综合外征。读时注意四层：① 命与运（面部如命，气色如运）→ ② 四时气色规律（终身/一年/一月/一日）→ ③ 科名气色（黄色为主）→ ④ 忌色（白青为忌，但需辨别原因）。核心：气色是精神的镜子——内精神，外气色。</p></div><div class="panel" data-panel="sheng"><div class="sheng-wrap"><ol class="sheng"><li>你最近气色如何？是精神饱满还是疲惫倦怠？</li><li>你有没有「心事忧劳，青如凝墨」？你需要怎样调整？</li></ol><div class="sheng-note-box"><label class="sheng-lab">我的践行笔记 <span class="sheng-count" id="shengCount-7">0</span> 字</label><textarea class="sheng-note" id="shengNote-7" data-n="7" rows="3" placeholder="把今天的体悟写下来：哪一句戳中你？你打算怎么用？"></textarea></div></div></div></div>
+    </div>
+  </article>
+      </section>
+
+      <nav class="pager" id="pager">
+        <div class="pager-row">
+          <button class="btn ghost" id="prevCh" aria-label="上一章">← 上一章</button>
+          <span class="pager-info" id="pagerInfo"></span>
+          <button class="btn" id="nextCh" aria-label="下一章">下一章 →</button>
+        </div>
+      </nav>
+
+      <footer>
+        <p>文本依据：朱熹《四书章句集注 · 冰鉴章句》七章，并与《礼记 · 冰鉴》原文交叉校对。</p>
+        <p>冰鉴共读 · 一天一章 · 七天</p>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<div id="tocBackdrop"></div>
+<nav class="bottom-nav" id="bottomNav" aria-label="底部导航">
+  <button class="bn-item act-home">首页</button>
+  <button class="bn-item act-study">研读</button>
+  <button class="bn-item act-today">今日</button>
+  <button class="bn-item act-toc">目录</button>
+  <button class="bn-item act-tools" id="toolsBtnBottom">工具箱</button>
+</nav>
+<button class="backtop" id="backTop" title="回到顶部">顶</button>
+<div class="toast" id="toast"></div>
+<script>
+var CHAPTERS = [{"n": 1, "label": "神骨", "text": "语云：脱谷为糠，其髓斯存，神之谓也。山骞不崩，惟石为镇，骨之谓也。一身精神，具乎两目；一身骨相，具乎面部。他家兼论形骸，文人先观神骨，开门见山，此为第一。相家论神，有清浊之辨。清浊易辨，邪正难辨。欲辨邪正，先观动静。静若含珠，动若水发；静若无人，动若赴敌。此为澄清到底。静若萤光，动若流水，尖巧喜淫；静若半睡，动若鹿骇，别才而深思；一为败器，一为隐流。均之。托迹二清，不可不辨。凡精神抖擞时易见，断续时难见。断者出处断，续者闭处续。道家所谓收拾入门之说，不了处看其脱略，做了处看其针线。小心者，从其做不了处看之，疏节阔目，若不经意，所谓脱略也。大胆者，从其做了处看之，慎重周密，无有苟且，所谓针线也。二者实看向内处，稍移外便落情态矣，情态易见。骨有九起：天庭骨隆起，枕骨强起，顶骨平起，佐串骨角起，太阳骨线起，眉骨伏犀起，鼻骨芽起，颧骨丰起，颊骨平伏起。在头以天庭骨、枕骨、太阳骨为主；在面以眉骨、颧骨为主。五者备，柱石器也。一则不穷，二则不贱，三动履小胜，四贵异。骨有色，面以青为主，少年公卿半青面是也。紫次之，白斯下矣。骨有质，头以联者为贵，匾者次之，碎为最下。总之，头少恶骨，面佳不如头佳。然大而缺天庭，终是贱品；圆而无串骨，半为孤僧；鼻骨犯眉，堂上不寿；颧与眼争，子嗣不立。此中贵贱，有毫厘千里之辨。", "paras": ["语云：脱谷为糠，其髓斯存，神之谓也。山骞不崩，惟石为镇，骨之谓也。一身精神，具乎两目；一身骨相，具乎面部。他家兼论形骸，文人先观神骨，开门见山，此为第一。", "相家论神，有清浊之辨。清浊易辨，邪正难辨。欲辨邪正，先观动静。静若含珠，动若水发；静若无人，动若赴敌。此为澄清到底。静若萤光，动若流水，尖巧喜淫；静若半睡，动若鹿骇，别才而深思；一为败器，一为隐流。均之。托迹二清，不可不辨。", "凡精神抖擞时易见，断续时难见。断者出处断，续者闭处续。道家所谓收拾入门之说，不了处看其脱略，做了处看其针线。小心者，从其做不了处看之，疏节阔目，若不经意，所谓脱略也。大胆者，从其做了处看之，慎重周密，无有苟且，所谓针线也。二者实看向内处，稍移外便落情态矣，情态易见。", "骨有九起：天庭骨隆起，枕骨强起，顶骨平起，佐串骨角起，太阳骨线起，眉骨伏犀起，鼻骨芽起，颧骨丰起，颊骨平伏起。在头以天庭骨、枕骨、太阳骨为主；在面以眉骨、颧骨为主。五者备，柱石器也。一则不穷，二则不贱，三动履小胜，四贵异。", "骨有色，面以青为主，少年公卿半青面是也。紫次之，白斯下矣。骨有质，头以联者为贵，匾者次之，碎为最下。总之，头少恶骨，面佳不如头佳。然大而缺天庭，终是贱品；圆而无串骨，半为孤僧；鼻骨犯眉，堂上不寿；颧与眼争，子嗣不立。此中贵贱，有毫厘千里之辨。"]}, {"n": 2, "label": "刚柔", "text": "既识神骨，当辨刚柔。刚柔即五行生克之数，名曰先天种子。不足用补，有余用泄，消息直与命通，此其皎然易见。五行有合法。木合火，水合木，此顺而合。顺者多富，即贵亦在浮沉之间。金与火仇，有时合火，推之水土皆然，此逆而合。逆者其贵非常。然所谓逆合者，金形带火则然，火形带金则三十死矣；水形带土则然，土形带水则孤寒老矣；木形带金则然，金形带木则刀剑随身矣。此外牵合，俱是杂格，不入文人正论。五行为外刚柔，内刚柔则喜怒、伏跳、深浅者是。喜高怒重，过目辄忘，近粗。伏亦不伉，跳亦不扬，近蠢。初念甚浅，转念甚深，近奸。内奸者，功名可期。粗蠢各半者，胜人以寿。纯奸能豁达者，其人终成。纯粗无周密者，半途必弃。观人所忽，十得八九矣。", "paras": ["既识神骨，当辨刚柔。刚柔即五行生克之数，名曰先天种子。不足用补，有余用泄，消息直与命通，此其皎然易见。", "五行有合法。木合火，水合木，此顺而合。顺者多富，即贵亦在浮沉之间。金与火仇，有时合火，推之水土皆然，此逆而合。逆者其贵非常。然所谓逆合者，金形带火则然，火形带金则三十死矣；水形带土则然，土形带水则孤寒老矣；木形带金则然，金形带木则刀剑随身矣。此外牵合，俱是杂格，不入文人正论。", "五行为外刚柔，内刚柔则喜怒、伏跳、深浅者是。喜高怒重，过目辄忘，近粗。伏亦不伉，跳亦不扬，近蠢。初念甚浅，转念甚深，近奸。内奸者，功名可期。粗蠢各半者，胜人以寿。纯奸能豁达者，其人终成。纯粗无周密者，半途必弃。观人所忽，十得八九矣。"]}, {"n": 3, "label": "容貌", "text": "容以七尺为期，貌合两仪而论。背腹手足，实接五方；耳目口鼻，全通四气。相顾相称则福生，如肖如凑，则林林总总不足论也。容贵整，整非整齐之谓。短不豕蹲，长不茅立，肥不熊餐，瘦不鹊寒，所谓整也。背宜圆，腹宜突坦，手宜温软，曲若弯弓，足宜丰满，下宜藏蛋，所谓整也。五短多贵，两大不扬，负重高官，鼠行好利，此为定格。他如手长其身，身长过于体，配以佳骨，定主封侯。罗纹满身，胸有秀骨，配以妙神，不拜相即鼎甲。相貌家有清、古、奇、秀之别，总之不必，须看科名星、阴骘纹为主。科名星，十三岁至三十九岁随时而见；阴骘纹，十九岁至四十六岁随时而见。二见全，大物也，得一亦贵。科名星见于印堂、眉尾，时隐时见，或为刚针，或为小丸，常有光气，酒后及发怒时易见。阴骘纹见于眼角，阴雨便见，如三叉样，假寐时最易见。得科名星早发，得阴骘纹迟发。二者全无，前程莫问。阴骘纹见于喉间，又主子贵，杂路不在此格。目者面之渊，不深则不清；鼻者面之山，不高则不灵。口阔而方禄千钟，齿多而固不家食。眼角入鬓，必掌刑名；耳白过面，终身钱谷。此贵征也。舌脱无官，橘面不显；文人不伤在眼，鹰准动便食人。此贱征也。", "paras": ["容以七尺为期，貌合两仪而论。背腹手足，实接五方；耳目口鼻，全通四气。相顾相称则福生，如肖如凑，则林林总总不足论也。", "容贵整，整非整齐之谓。短不豕蹲，长不茅立，肥不熊餐，瘦不鹊寒，所谓整也。背宜圆，腹宜突坦，手宜温软，曲若弯弓，足宜丰满，下宜藏蛋，所谓整也。五短多贵，两大不扬，负重高官，鼠行好利，此为定格。他如手长其身，身长过于体，配以佳骨，定主封侯。罗纹满身，胸有秀骨，配以妙神，不拜相即鼎甲。", "相貌家有清、古、奇、秀之别，总之不必，须看科名星、阴骘纹为主。科名星，十三岁至三十九岁随时而见；阴骘纹，十九岁至四十六岁随时而见。二见全，大物也，得一亦贵。科名星见于印堂、眉尾，时隐时见，或为刚针，或为小丸，常有光气，酒后及发怒时易见。阴骘纹见于眼角，阴雨便见，如三叉样，假寐时最易见。得科名星早发，得阴骘纹迟发。二者全无，前程莫问。阴骘纹见于喉间，又主子贵，杂路不在此格。", "目者面之渊，不深则不清；鼻者面之山，不高则不灵。口阔而方禄千钟，齿多而固不家食。眼角入鬓，必掌刑名；耳白过面，终身钱谷。此贵征也。舌脱无官，橘面不显；文人不伤在眼，鹰准动便食人。此贱征也。"]}, {"n": 4, "label": "情态", "text": "容貌者，骨之余，常佐骨之不足。情态者，神之余，常佐神之不足。久注观人精神，乍见观人情态。大家举止，羞涩亦佳；小儿行藏，跳叫愈失。大旨亦辨清浊，细处兼论取舍。人有弱态，有狂态，有疏懒态，有周旋态。飞鸟依人，情致婉转，此弱态也。不衫不履，旁若无人，此狂态也。坐立自如，问答随意，此疏懒态也。饰其中机，不苟言笑，察言观色，趋吉避凶，此周旋态也。皆根其性，不由矫枉。弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器；反此，败类也。大概亦得二三矣。前者恒态，亦有时态。方与对谈，神忽他往；众方称言，此独冷笑；深险难近，不足与论情。言不必当，极口称是；未交此人，故意诋毁；卑庸可耻，不足与论事。漫无可否，临事迟回；不甚关情，亦为堕泪；愚昧之仁，不足与谈心。三者不必定人终身。反此以求，可以交天下士。", "paras": ["容貌者，骨之余，常佐骨之不足。情态者，神之余，常佐神之不足。久注观人精神，乍见观人情态。大家举止，羞涩亦佳；小儿行藏，跳叫愈失。大旨亦辨清浊，细处兼论取舍。", "人有弱态，有狂态，有疏懒态，有周旋态。飞鸟依人，情致婉转，此弱态也。不衫不履，旁若无人，此狂态也。坐立自如，问答随意，此疏懒态也。饰其中机，不苟言笑，察言观色，趋吉避凶，此周旋态也。皆根其性，不由矫枉。弱而不媚，狂而不哗，疏懒而真诚，周旋而健举，皆能成器；反此，败类也。大概亦得二三矣。", "前者恒态，亦有时态。方与对谈，神忽他往；众方称言，此独冷笑；深险难近，不足与论情。言不必当，极口称是；未交此人，故意诋毁；卑庸可耻，不足与论事。漫无可否，临事迟回；不甚关情，亦为堕泪；愚昧之仁，不足与谈心。三者不必定人终身。反此以求，可以交天下士。"]}, {"n": 5, "label": "须眉", "text": "须眉男子。未有须眉不具，可称男子者。少年两道眉，临老一林须。此言眉主早成，须主晚运也。然而，紫面无眉自贵，暴腮缺须亦荣。郭令公半部不全，霍剽姚一副寡脸。此等间逢。毕竟有须眉者十之九也。眉尚彩，彩者，杪处反光是也。贵人有三层彩，有一二层彩者，所谓文明气象。宜疏爽不宜凝滞，一望有乘风翔舞之势者，上也；如泼墨者，最下。倒竖者，上也；下垂者，最下。长有起伏，短有神气，浓忌浮光，淡忌枯索。如剑者掌兵权，如帚者赴法场。个中亦有微茫，不可不辨。他如压眼不利，散乱多忧，细而带媚，粗而无文，最是下乘。须有多寡，取其与眉相称。多者宜清、宜疏、宜缩、宜参差不齐；少者宜健、宜光、宜圆、宜有情照顾。卷如螺纹，聪明豁达；长如解索，风流荣显；劲如张戟，位高权重；亮若银条，早登廊庙。皆官途大器。紫须剑眉，声音洪壮；蓬然虬乱，尝见耳后；配以神骨清奇，不千里封侯，亦十年拜相。他如辅须先长终不利，人中不见一世穷，鼻毛接须多晦滞，短髭遮口饿终身，此其显可见矣。", "paras": ["须眉男子。未有须眉不具，可称男子者。少年两道眉，临老一林须。此言眉主早成，须主晚运也。然而，紫面无眉自贵，暴腮缺须亦荣。郭令公半部不全，霍剽姚一副寡脸。此等间逢。毕竟有须眉者十之九也。", "眉尚彩，彩者，杪处反光是也。贵人有三层彩，有一二层彩者，所谓文明气象。宜疏爽不宜凝滞，一望有乘风翔舞之势者，上也；如泼墨者，最下。倒竖者，上也；下垂者，最下。长有起伏，短有神气，浓忌浮光，淡忌枯索。如剑者掌兵权，如帚者赴法场。个中亦有微茫，不可不辨。他如压眼不利，散乱多忧，细而带媚，粗而无文，最是下乘。", "须有多寡，取其与眉相称。多者宜清、宜疏、宜缩、宜参差不齐；少者宜健、宜光、宜圆、宜有情照顾。卷如螺纹，聪明豁达；长如解索，风流荣显；劲如张戟，位高权重；亮若银条，早登廊庙。皆官途大器。紫须剑眉，声音洪壮；蓬然虬乱，尝见耳后；配以神骨清奇，不千里封侯，亦十年拜相。他如辅须先长终不利，人中不见一世穷，鼻毛接须多晦滞，短髭遮口饿终身，此其显可见矣。"]}, {"n": 6, "label": "声音", "text": "人之声音，犹天地之气，轻清上浮，重浊下坠。始于丹田，发于喉，转于舌，辨于齿，出于唇，实与五音相配。取其自成一家，不必一一合调。闻声相思，其人斯在，宁必一见决雌雄哉。声与音不同。声主张，寻发处见；音主敛，寻歇处见。辨声之法，必辨喜怒哀乐。喜如折竹当风，怒如阴雷起地，哀如石击薄冰，乐如雪舞风前，大概以轻清为上。声雄者，如钟则贵，如锣则贱；声雌者，如雉鸣则贵，如蛙鸣则贱。远听声洪，近听悠扬，起若乘风，止若拍瑟，上上；大言不张唇，细言若无齿，上也。出而不返，荒郊牛鸣；急而不达，深夜鼠嚼；或字句相联，喋喋利口；或齿喉隔断，喈喈混谈；市井之夫，何足比数。音者，声之余也，与声相去不远，此则从细处曲中见直。贫贱者有声无音，尖巧者有音无声，所谓禽无声、兽无音是也。凡人说话是声，其散在左右前后是音。开谈若含情，话终多余响，不惟雅人，兼称国士；阔口无溢出，尖舌无窕音，不惟实厚，兼获名高。", "paras": ["人之声音，犹天地之气，轻清上浮，重浊下坠。始于丹田，发于喉，转于舌，辨于齿，出于唇，实与五音相配。取其自成一家，不必一一合调。闻声相思，其人斯在，宁必一见决雌雄哉。", "声与音不同。声主张，寻发处见；音主敛，寻歇处见。辨声之法，必辨喜怒哀乐。喜如折竹当风，怒如阴雷起地，哀如石击薄冰，乐如雪舞风前，大概以轻清为上。声雄者，如钟则贵，如锣则贱；声雌者，如雉鸣则贵，如蛙鸣则贱。远听声洪，近听悠扬，起若乘风，止若拍瑟，上上；大言不张唇，细言若无齿，上也。出而不返，荒郊牛鸣；急而不达，深夜鼠嚼；或字句相联，喋喋利口；或齿喉隔断，喈喈混谈；市井之夫，何足比数。", "音者，声之余也，与声相去不远，此则从细处曲中见直。贫贱者有声无音，尖巧者有音无声，所谓禽无声、兽无音是也。凡人说话是声，其散在左右前后是音。开谈若含情，话终多余响，不惟雅人，兼称国士；阔口无溢出，尖舌无窕音，不惟实厚，兼获名高。"]}, {"n": 7, "label": "气色", "text": "面部如命，气色如运。大命固宜整齐，小运亦当亨泰。是故光焰不发，珠玉与瓦砾同观；藻绘未扬，缯帛与布葛齐价。大者主一生祸福，小者亦三月吉凶。人以气为主，于内为精神，于外为气色。有终身之气色，少淡、长明、壮艳、老素是也。有一年之气色，春青、夏红、秋黄、冬白是也。有一月之气色，朔后森发，望后隐跃是也。有一日之气色，早透、昼满、晚停、暮静是也。科名中人，以黄色为主，此正色也。黄云盖顶，必掇大魁；黄翅入鬓，进身不远；印堂黄色，富贵逼人；学堂紫净，明年及第。他如眼角霞鲜，决利小考；印堂垂紫，动获小利；红晕中分，定产佳儿；两颧红润，骨肉发迹。由此推之，足见一斑矣。色忌白、忌青。青常见于眼底，白常发于眉端。然亦有不同。心事忧劳，青如凝墨；祸生不测，青如浮烟；酒色惫倦，白如卧羊；灾晦催人，白如傅粉。又或青而带紫，金形遇之而飞扬；白而有光，土庚相当亦富贵；又不在此论也。最不佳者，太白夹日月，乌鸟集天庭，桃花散面颊，赬尾守地阁。有一于此，前程退落，祸患再三矣。", "paras": ["面部如命，气色如运。大命固宜整齐，小运亦当亨泰。是故光焰不发，珠玉与瓦砾同观；藻绘未扬，缯帛与布葛齐价。大者主一生祸福，小者亦三月吉凶。", "人以气为主，于内为精神，于外为气色。有终身之气色，少淡、长明、壮艳、老素是也。有一年之气色，春青、夏红、秋黄、冬白是也。有一月之气色，朔后森发，望后隐跃是也。有一日之气色，早透、昼满、晚停、暮静是也。", "科名中人，以黄色为主，此正色也。黄云盖顶，必掇大魁；黄翅入鬓，进身不远；印堂黄色，富贵逼人；学堂紫净，明年及第。他如眼角霞鲜，决利小考；印堂垂紫，动获小利；红晕中分，定产佳儿；两颧红润，骨肉发迹。由此推之，足见一斑矣。", "色忌白、忌青。青常见于眼底，白常发于眉端。然亦有不同。心事忧劳，青如凝墨；祸生不测，青如浮烟；酒色惫倦，白如卧羊；灾晦催人，白如傅粉。又或青而带紫，金形遇之而飞扬；白而有光，土庚相当亦富贵；又不在此论也。最不佳者，太白夹日月，乌鸟集天庭，桃花散面颊，赬尾守地阁。有一于此，前程退落，祸患再三矣。"]}];
+var TOTAL = 7;
+var CN = ["一", "二", "三", "四", "五", "六", "七"];
+var ANSHEN = ["一身精神具乎两目——你的眼里有光吗？", "不足用补，有余用泄——你知道自己该补还是该泄吗？", "相顾相称则福生——你整体协调吗？", "弱而不媚，狂而不哗——你的态有度吗？", "眉尚彩——你的精神有光彩吗？", "闻声相思，其人斯在——你的声音有底气有余韵吗？", "人以气为主——你的气色好吗？内精神外气色，都照顾到了吗？"];
+var SHENGQ = {"1": ["你观察别人时，有没有先从「精神」和「眼神」入手？", "你的眼神传达了什么？是安定清澈还是飘忽不定？"], "2": ["你的先天禀赋偏刚还是偏柔？你有没有「补」或「泄」？", "你是初念浅还是转念深的人？你有没有「豁达」来平衡深沉？"], "3": ["你的整体「相顾相称」吗？还是某一处特别突出而失衡？", "你有没有「阴骘纹」——积累阴德而不张扬？"], "4": ["你属于弱态、狂态、疏懒态还是周旋态？你的「度」守得好吗？", "你有没有「神忽他往」「漫无可否」的时态？身边有这样的人吗？"], "5": ["你的「光彩」如何？精神饱满还是暗淡无光？", "你整体「相称」吗？有没有某一处特别不协调？"], "6": ["你的声音是轻清上浮还是重浊下坠？有没有余韵？", "你说话「开谈含情、话终余响」吗？还是话一说完就断？"], "7": ["你最近气色如何？是精神饱满还是疲惫倦怠？", "你有没有「心事忧劳，青如凝墨」？你需要怎样调整？"]};
+var LS_KEY = 'bingjian_start_v1';
+var PAGED = true;          /* 默认分页阅读 */
+var CURRENT = 1;           /* 当前阅读章号（封面/研读时仍记录上次章） */
+function currentChapter(){ return CURRENT; }
+
+/* 阅读进度书签：记住最后读到的章，目录标灰已读，封面提供「继续阅读」 */
+var LAST_KEY = 'bingjian_last_v1';
+var lastRead = parseInt(lsGet(LAST_KEY) || '0', 10) || 0;
+function markReadToc(){
+  var links = document.querySelectorAll('.toc a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].classList.toggle('read', +links[i].getAttribute('data-n') <= lastRead);
+  }
+  var rb = document.getElementById('resumeBtn');
+  if (rb) {
+    if (lastRead > 0) { rb.hidden = false; rb.textContent = '继续阅读 · 第' + CN[lastRead - 1] + '章'; }
+    else { rb.hidden = true; }
+  }
+}
+
+function $(s){ return document.querySelector(s); }
+function eachNode(list, fn){ for (var i = 0; i < list.length; i++) { fn(list[i], i); } }
+/* 浏览器本地缓存开始日期：优先 localStorage，沙箱/隐私模式不可用时回退到 cookie，
+   确保「今日共读」设置不会每次重置 */
+function lsGet(k){
+  try { var v = window.localStorage.getItem(k); if (v) { return v; } } catch (e) {}
+  try { var m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)')); if (m) { return decodeURIComponent(m[1]); } } catch (e) {}
+  return null;
+}
+function lsSet(k, v){
+  try { window.localStorage.setItem(k, v); } catch (e) {}
+  try { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=31536000'; } catch (e) {}
+}
+/* 老版本 WebView 不支持带选项的 scrollIntoView */
+function scrollToEl(el, center){
+  try { el.scrollIntoView(center ? { behavior: 'smooth', block: 'center' } : { behavior: 'smooth', block: 'start' }); }
+  catch (e) { try { el.scrollIntoView(); } catch (e2) {} }
+}
+/* 受控缓动滚动：固定时长(默认500ms)到位，避免全局 scroll-behavior:smooth 在超长文档上“长距离爬行”数秒；
+   behavior:'auto' 覆盖 CSS 平滑，由 rAF 自行插值，结果稳定可测 */
+function easeScrollTo(top, duration){
+  duration = duration || 500;
+  top = Math.max(0, Math.round(top));
+  var start = window.scrollY || window.pageYOffset || 0;
+  var dist = top - start;
+  if (Math.abs(dist) < 2) { return; }
+  var t0 = (window.performance && performance.now) ? performance.now() : Date.now();
+  var step = function(now){
+    var p = Math.min(1, (now - t0) / duration);
+    var e = 1 - Math.pow(1 - p, 3); /* easeOutCubic */
+    try { window.scrollTo({ top: start + dist * e, behavior: 'auto' }); }
+    catch (err) { window.scrollTo(0, start + dist * e); }
+    if (p < 1) { (window.requestAnimationFrame || setTimeout)(step); }
+  };
+  (window.requestAnimationFrame || function(f){ return setTimeout(function(){ f((window.performance&&performance.now)?performance.now():Date.now()); }, 16); })(step);
+}
+function isWide(){ try { return window.matchMedia('(min-width:1024px)').matches; } catch (e) { return false; } }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function dateStr(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function parseDate(s){ var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function fmtCN(d){ return (d.getMonth() + 1) + '月' + d.getDate() + '日'; }
+function addDays(s, n){ var d = parseDate(s); d.setDate(d.getDate() + n); return d; }
+
+var startDate = lsGet(LS_KEY);
+if (!startDate) { startDate = dateStr(new Date()); }
+
+function dayIndex(){
+  var t = parseDate(dateStr(new Date()));
+  var s = parseDate(startDate);
+  return Math.round((t - s) / 86400000) + 1;
+}
+
+/* 刷新目录中的日程日期 */
+function refreshTocDates(){
+  var ds = document.querySelectorAll('.toc .d');
+  for (var i = 0; i < ds.length && i < TOTAL; i++) {
+    ds[i].textContent = '第' + (i + 1) + '天 · ' + fmtCN(addDays(startDate, i));
+  }
+}
+
+/* 今日共读状态：徽章 / 本章 / 进度 / 目录高亮 */
+function updateToday(){
+  var idx = dayIndex();
+  var d = Math.max(1, Math.min(TOTAL, idx));
+  var notStarted = idx < 1;
+  var done = idx > TOTAL;
+  $('#dayChip').textContent = done ? '33 / 33 天 · 已完成'
+    : (notStarted ? '共读未开始' : '第 ' + idx + ' / ' + TOTAL + ' 天');
+  $('#todayLine').innerHTML = done ? '七天已通读完毕 · 温故而知新'
+    : (notStarted ? '共读尚未开始 · 首日从第一章读起'
+       : '第' + CN[d - 1] + '章 · ' + CHAPTERS[d - 1].label);
+  $('#progressBar').style.width = (done ? 100 : d / TOTAL * 100) + '%';
+  var links = document.querySelectorAll('.toc a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].classList.toggle('today', !done && +links[i].getAttribute('data-n') === d);
+  }
+  refreshAnshen(d);
+}
+
+/* 我的践行笔记：按章存本机，载入即回填；导出为 33 天自省文本 */
+var SHENG_KEY = 'bingjian_sheng_';
+function shengKey(n){ return SHENG_KEY + n; }
+function loadShengNotes(){
+  var tas = document.querySelectorAll('.sheng-note');
+  for (var i = 0; i < tas.length; i++) {
+    var ta = tas[i];
+    var n = ta.getAttribute('data-n');
+    var v = '';
+    try { v = window.localStorage.getItem(shengKey(n)) || ''; } catch (e) {}
+    ta.value = v;
+    var cnt = document.getElementById('shengCount-' + n);
+    if (cnt) { cnt.textContent = v.length; }
+  }
+}
+function bindShengNotes(){
+  document.addEventListener('input', function(e){
+    var ta = e.target;
+    if (!ta || ta.className !== 'sheng-note') { return; }
+    var n = ta.getAttribute('data-n');
+    try { window.localStorage.setItem(shengKey(n), ta.value); } catch (err) {}
+    var cnt = document.getElementById('shengCount-' + n);
+    if (cnt) { cnt.textContent = ta.value.length; }
+  });
+}
+function exportSheng(){
+  var tip = document.getElementById('exportTip');
+  var lines = ['《冰鉴》我的 7 天自省', '（生成于 ' + dateStr(new Date()) + '）', ''];
+  for (var n = 1; n <= TOTAL; n++) {
+    var qs = (SHENGQ[String(n)] || []);
+    var note = '';
+    try { note = window.localStorage.getItem(shengKey(n)) || ''; } catch (e) {}
+    if (!qs.length && !note.trim()) { continue; }
+    lines.push('第' + CN[n - 1] + '章 · ' + (CHAPTERS[n - 1] ? CHAPTERS[n - 1].label : ''));
+    for (var i = 0; i < qs.length; i++) { lines.push('  自省问：' + qs[i]); }
+    lines.push('  我的笔记：' + (note.trim() || '（未写）'));
+    lines.push('');
+  }
+  var text = lines.join('\n');
+  try {
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = '冰鉴_我的' + TOTAL + '天自省.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ try { URL.revokeObjectURL(url); } catch (e) {} }, 1000);
+    if (tip) { tip.textContent = '已导出 ' + (lines.length) + ' 行（仅含你写的内容）'; }
+  } catch (e) {
+    if (tip) { tip.textContent = '当前环境不支持下载，已复制到剪贴板'; }
+    copyText(text);
+  }
+}
+
+/* 今日安心签：按今日章（或当前章）取一句，可分享 */
+function refreshAnshen(chapter){
+  var el = document.getElementById('anshenText');
+  if (!el) { return; }
+  var n = (typeof chapter === 'number' && chapter >= 1 && chapter <= TOTAL) ? chapter : Math.max(1, Math.min(TOTAL, dayIndex()));
+  var txt = (ANSHEN && ANSHEN[n - 1]) ? ANSHEN[n - 1] : '';
+  el.textContent = txt;
+  el.setAttribute('data-n', n);
+  var tp = document.getElementById('tpAnshenText');
+  if (tp) { tp.textContent = txt; tp.setAttribute('data-n', n); }
+}
+function shareAnshen(){
+  var el = document.getElementById('anshenText');
+  if (!el) { return; }
+  var txt = el.textContent.trim();
+  if (!txt) { return; }
+  var n = el.getAttribute('data-n') || '1';
+  var base = SHARE_BASE || ((location.origin || '') + (location.pathname || ''));
+  var link = base ? (base.replace(/\/$/, '') + '#ch-' + n) : '';
+  copyText('【今日安心签】《冰鉴·第' + CN[n - 1] + '章》\n' + txt + (link ? '\n' + link : ''));
+}
+
+/* 跳到今日共读章节 */
+function jumpToday(){
+  var d = Math.max(1, Math.min(TOTAL, dayIndex()));
+  if (PAGED) { showChapter(d); return; }
+  var el = document.getElementById('ch-' + d);
+  if (!el) { return; }
+  scrollToEl(el);
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+  try { history.replaceState(null, '', '#ch-' + d); } catch (e) {}
+}
+
+/* 让目录栏滚动到当前章节（宽屏）或展开目录（窄屏） */
+function revealTocActive(){
+  var dd = document.getElementById('tocDetails');
+  if (dd && !dd.open) { dd.open = true; }
+  var act = document.querySelector('.toc a.active') || document.querySelector('.toc a');
+  if (act) { scrollToEl(act, true); }
+}
+
+function chapterCopyText(n){
+  var c = CHAPTERS[n - 1];
+  var t = c.paras ? c.paras.join('\n') : c.text;
+  return '《冰鉴》第' + CN[n - 1] + '章（' + c.label + '）\n\n' + t;
+}
+
+function copyText(t){
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(function(){ toast('已复制，去群里粘贴吧'); }, function(){ legacyCopy(t); });
+  } else { legacyCopy(t); }
+}
+function legacyCopy(t){
+  var ta = document.createElement('textarea');
+  ta.value = t;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast('已复制，去群里粘贴吧'); }
+  catch (e) { toast('复制失败，请手动选择文本'); }
+  document.body.removeChild(ta);
+}
+
+var toastTimer = null;
+function toast(msg, ms){
+  var el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, ms || 1800);
+}
+
+/* 分享本章：优先调用系统分享面板（移动端），否则复制带 #ch-N 的直达链接。
+   固定输出公开站点地址 SHARE_BASE：书友打开即直达本章，无需登录。
+   若将来更换/下线了公开站点，改这里即可；留空则回退为当前页面地址。 */
+var SHARE_BASE = '';
+function shareChapter(n){
+  n = Math.max(1, Math.min(TOTAL, n));
+  var base = SHARE_BASE || ((location.origin || '') + (location.pathname || ''));
+  var url = base + '#ch-' + n;
+  var title = '《冰鉴》第' + CN[n - 1] + '章 · ' + CHAPTERS[n - 1].label;
+  /* 先把地址栏同步为该章（replaceState 不产生历史记录）：
+     个别浏览器/WebView 的系统分享会忽略传入 url、改用当前页面地址，
+     同步后即使走这条路，分享出去的也一定是带 #ch-N 的直达链接。 */
+  try { history.replaceState(null, '', '#ch-' + n); } catch (e) {}
+  if (navigator.share) {
+    navigator.share({ title: title, text: title, url: url }).catch(function (err) {
+      /* 用户主动取消（AbortError）不打扰；其余失败（权限被拒、iframe 内被禁等）回退为复制 */
+      if (err && err.name === 'AbortError') { return; }
+      copyText(url);
+      toast('已复制本章链接，分享即可直达');
+    });
+    return;
+  }
+  copyText(url);
+  toast('已复制本章链接，分享即可直达');
+}
+
+$('#todayBtn').addEventListener('click', jumpToday);
+/* 继续阅读：回到上次读到的章（分页切视图 / 连续滚动定位） */
+var resumeBtn = document.getElementById('resumeBtn');
+if (resumeBtn) {
+  resumeBtn.addEventListener('click', function(){
+    var n = Math.max(1, Math.min(TOTAL, lastRead || 1));
+    if (PAGED) { showChapter(n); return; }
+    var el = document.getElementById('ch-' + n);
+    if (!el) { return; }
+    scrollToEl(el);
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  });
+}
+$('#jumpBtn').addEventListener('click', jumpToday);
+/* 窄屏抽屉打开后：把目录滚动到当前章（分页取 CURRENT，连续取 scroll-spy 高亮，均兜底为今日章） */
+function revealTocMobile(){
+  var dd = document.getElementById('tocDetails');
+  if (dd && !dd.open) { dd.open = true; }
+  var act = document.querySelector('.toc a.active');
+  if (!act) {
+    var dn = (typeof CURRENT === 'number' && CURRENT >= 1) ? CURRENT : Math.max(1, Math.min(TOTAL, dayIndex()));
+    act = document.querySelector('.toc a[data-n="' + dn + '"]');
+  }
+  var sc = document.querySelector('.sidebar');
+  if (!act || !sc) { return; }
+  var doScroll = function(){
+    try {
+      var er = act.getBoundingClientRect(), sr = sc.getBoundingClientRect();
+      /* 垂直方向不受抽屉水平滑入动画影响，可立即计算；动画结束后再校准一次 */
+      sc.scrollTop += er.top - sr.top - (sr.height - er.height) / 2;
+    } catch (e) {}
+  };
+  doScroll();
+  setTimeout(doScroll, 300);
+}
+/* 目录按钮：宽屏滚动目录到当前章；窄屏开/关抽屉（打开时顺带滚动到当前章） */
+function toggleToc(force){
+  var open = (typeof force === 'boolean') ? force : !document.body.classList.contains('toc-open');
+  document.body.classList.toggle('toc-open', open);
+  eachNode(document.querySelectorAll('.act-toc'), function(el){ el.classList.toggle('active', open); });
+  if (open && !isWide()) { revealTocMobile(); }
+}
+$('#tocBtn').addEventListener('click', function(){
+  if (isWide()) { revealTocActive(); } else { toggleToc(); }
+});
+$('#tocBackdrop').addEventListener('click', function(){ document.body.classList.remove('toc-open'); });
+/* 注音开关（顶栏 + 抽屉工具区两处按钮，状态同步） */
+function syncPy(){
+  var on = !document.body.classList.contains('no-py');
+  var bs = document.querySelectorAll('.py-toggle');
+  for (var i = 0; i < bs.length; i++) { bs[i].classList.toggle('on', on); bs[i].textContent = on ? '开' : '关'; }
+}
+(function(){
+  var bs = document.querySelectorAll('.py-toggle');
+  for (var i = 0; i < bs.length; i++) {
+    (function(b){
+      b.addEventListener('click', function(){
+        document.body.classList.toggle('no-py');
+        syncPy();
+      });
+    })(bs[i]);
+  }
+  syncPy();
+})();
+/* 首页 / 研读：分页模式切换视图；连续模式平滑滚动到对应区 */
+$('#homeBtn').addEventListener('click', function(){
+  if (PAGED) { showCover(); } else { var c = document.getElementById('cover'); if (c) scrollToEl(c); }
+});
+$('#studyBtn').addEventListener('click', function(){
+  if (PAGED) { showStudy(); } else { var s = document.getElementById('study'); if (s) scrollToEl(s); }
+});
+/* 底部 tab 栏（移动端）：与顶栏导航同逻辑 */
+eachNode(document.querySelectorAll('.bn-item'), function(el){
+  el.addEventListener('click', function(){
+    if (el.classList.contains('act-home')) {
+      if (PAGED) { showCover(); } else { var c = document.getElementById('cover'); if (c) scrollToEl(c); }
+    } else if (el.classList.contains('act-study')) {
+      if (PAGED) { showStudy(); } else { var s = document.getElementById('study'); if (s) scrollToEl(s); }
+    } else if (el.classList.contains('act-today')) {
+      jumpToday();
+    } else if (el.classList.contains('act-toc')) {
+      if (isWide()) { revealTocActive(); } else { toggleToc(); }
+    }
+  });
+});
+
+document.addEventListener('click', function(e){
+  var t = e.target;
+  /* 通假/异读虚线字：点击弹出说明（悬浮 title 同文案），注明「某通某」及含义 */
+  var tj = t.closest ? t.closest('ruby.tj') : null;
+  if (tj) {
+    toast(tj.getAttribute('title') || '', 4200);
+    return;
+  }
+  /* 解读面板：点击学派名展开/收起简介 */
+  var jl = t.closest ? t.closest('.jlabel') : null;
+  if (jl) {
+    var jr = jl.closest('.jrow');
+    if (jr) {
+      var jopen = !jr.classList.contains('jopen');
+      jr.classList.toggle('jopen', jopen);
+      jl.setAttribute('aria-expanded', jopen ? 'true' : 'false');
+    }
+    return;
+  }
+  /* 章节详解：切换 译文/注释/串讲/解读/导读 标签页 */
+  var tab = t.closest ? t.closest('.tab-btn') : null;
+  if (tab) {
+    var art = tab.closest('.chapter');
+    if (art) {
+      var name = tab.getAttribute('data-tab');
+      var btns = art.querySelectorAll('.tab-btn');
+      for (var i = 0; i < btns.length; i++) { btns[i].classList.toggle('active', btns[i] === tab); }
+      var pans = art.querySelectorAll('.panel');
+      for (var j = 0; j < pans.length; j++) { pans[j].classList.toggle('active', pans[j].getAttribute('data-panel') === name); }
+    }
+    return;
+  }
+  /* 页面内跳转链接：分页模式下接管为「切换视图」；连续模式下交给原生锚点 */
+  var ha = t.closest ? t.closest('a[href^="#"]') : null;
+  if (ha && PAGED) {
+    var hid = ha.getAttribute('href');
+    if (hid === '#study') { e.preventDefault(); showStudy(); return; }
+    if (hid === '#cover') { e.preventDefault(); showCover(); return; }
+    if (/^#ch-\d+$/.test(hid)) {
+      e.preventDefault();
+      var nn = parseInt(hid.slice(4), 10);
+      if (!isWide()) { document.body.classList.remove('toc-open'); }
+      showChapter(nn);
+      return;
+    }
+  }
+  /* 回到目录 */
+  var back = t.closest ? t.closest('a[href="#toc"]') : null;
+  if (back) {
+    if (isWide()) {
+      e.preventDefault();
+      revealTocActive();
+    } else {
+      e.preventDefault();
+      toggleToc(true);
+    }
+    return;
+  }
+  var b = t.closest ? t.closest('.share-btn') : null;
+  if (b) { shareChapter(+b.getAttribute('data-n')); }
+});
+
+/* 修改开始日期：刷新日程并直接跳到对应章节；输入即时缓存到浏览器本地 */
+$('#startDate').value = startDate;
+var planDate0 = document.getElementById('planDateLabel');
+if (planDate0) { planDate0.textContent = startDate; }
+function onStartChange(){
+  var v = $('#startDate').value;
+  if (!v) { return; }
+  startDate = v;
+  lsSet(LS_KEY, v);
+  var pd = document.getElementById('planDateLabel');
+  if (pd) { pd.textContent = startDate; }
+  refreshTocDates();
+  updateToday();
+  jumpToday();
+  var idx = dayIndex();
+  var msg = idx < 1 ? '共读未开始，已定位到第一章'
+    : (idx > TOTAL ? '已通读完毕，定位到最后一章' : '已记住开始日期，定位到第 ' + idx + '章');
+  toast(msg);
+}
+$('#startDate').addEventListener('change', onStartChange);
+$('#startDate').addEventListener('input', onStartChange);
+
+/* 滚动联动：正文滚到哪一章，目录就高亮该项，并把目录栏滚动到对应位置（仅宽屏） */
+var spyCurrent = 0;
+var spyRaf = null;
+var raf = window.requestAnimationFrame || function(f){ return setTimeout(f, 16); };
+function chapterAtViewport(){
+  var arts = document.querySelectorAll('article.chapter');
+  if (!arts.length) { return 1; }
+  /* 已滚到页面底部：最后一章无法再抬到顶部，直接视为当前章 */
+  var sc = (document.documentElement || document.body);
+  var scrollBottom = window.scrollY + window.innerHeight;
+  if (scrollBottom >= sc.scrollHeight - 4) { return arts.length; }
+  var n = 1;
+  for (var i = 0; i < arts.length; i++) {
+    if (arts[i].getBoundingClientRect().top <= 140) { n = i + 1; } else { break; }
+  }
+  return n;
+}
+function scrollSidebarTo(el){
+  try {
+    var sc = document.querySelector('.sidebar');
+    if (!sc || !el) { return; }
+    var er = el.getBoundingClientRect(), sr = sc.getBoundingClientRect();
+    if (er.top < sr.top + 4 || er.bottom > sr.bottom - 4) {
+      sc.scrollTop += er.top - sr.top - (sr.height - er.height) / 2;
+    }
+  } catch (e) {}
+}
+function markActive(n){
+  var links = document.querySelectorAll('.toc a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].classList.toggle('active', +links[i].getAttribute('data-n') === n);
+  }
+  if (isWide()) {
+    scrollSidebarTo(document.querySelector('.toc a[data-n="' + n + '"]'));
+  }
+}
+function onScrollSpy(){
+  if (PAGED) { return; }
+  if (spyRaf) { return; }
+  spyRaf = raf(function(){
+    spyRaf = null;
+    var n = chapterAtViewport();
+    if (n !== spyCurrent) { spyCurrent = n; markActive(n); }
+  });
+}
+window.addEventListener('scroll', function(){
+  $('#backTop').classList.toggle('show', window.scrollY > 600);
+  onScrollSpy();
+}, { passive: true });
+$('#backTop').addEventListener('click', function(){
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* 目录详情始终展开（宽屏在侧栏、窄屏在抽屉中均需可见） */
+function syncTocDetails(){
+  var dd = document.getElementById('tocDetails');
+  if (dd) { dd.open = true; }
+}
+syncTocDetails();
+window.addEventListener('resize', syncTocDetails);
+
+/* ===== 分页阅读：视图切换 ===== */
+/* 当前页高亮：封面→首页；研读→研读；章节→若恰为今日则高亮「今日」；目录仅在抽屉打开时高亮 */
+function setNavActive(name, n){
+  eachNode(document.querySelectorAll('.nav-btn, .bn-item'), function(el){ el.classList.remove('active'); });
+  if (name === 'cover' || name === 'study') {
+    var cls = (name === 'cover') ? 'act-home' : 'act-study';
+    eachNode(document.querySelectorAll('.' + cls), function(el){ el.classList.add('active'); });
+  } else if (name === 'ch') {
+    if (n === Math.max(1, Math.min(TOTAL, dayIndex()))) {
+      eachNode(document.querySelectorAll('.act-today'), function(el){ el.classList.add('active'); });
+    }
+  }
+}
+function setView(name, n){
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) { views[i].classList.remove('active-view'); }
+  if (name === 'cover') {
+    var cov = document.getElementById('cover'); if (cov) { cov.classList.add('active-view'); }
+    document.body.classList.remove('view-chapter');
+  } else if (name === 'study') {
+    var st = document.getElementById('study'); if (st) { st.classList.add('active-view'); }
+    document.body.classList.remove('view-chapter');
+  } else {
+    var el = document.getElementById('ch-' + n);
+    if (el) { el.classList.add('active-view'); }
+    document.body.classList.add('view-chapter');
+    updatePager(n);
+  }
+  setNavActive(name, n);
+  try { window.scrollTo(0, 0); } catch (e2) {}
+}
+function updatePager(n){
+  var info = document.getElementById('pagerInfo');
+  if (info) { info.innerHTML = '第' + CN[n - 1] + '章<span class="psep"> · </span><span class="plabel">' + CHAPTERS[n - 1].label + '</span>'; }
+  var prev = document.getElementById('prevCh'), next = document.getElementById('nextCh');
+  if (prev) { prev.disabled = (n <= 1); }
+  if (next) { next.disabled = (n >= TOTAL); }
+}
+function showCover(){ setView('cover'); try { history.replaceState(null, '', '#cover'); } catch (e) {} }
+function showStudy(){ setView('study'); try { history.replaceState(null, '', '#study'); } catch (e) {} }
+function showChapter(n, keepHash){
+  n = Math.max(1, Math.min(TOTAL, n));
+  CURRENT = n;
+  setView('ch', n);
+  markActive(n);
+  if (n > lastRead) { lastRead = n; lsSet(LAST_KEY, String(n)); }
+  markReadToc();
+  if (keepHash !== false) { try { history.replaceState(null, '', '#ch-' + n); } catch (e) {} }
+}
+
+/* 翻页按钮（上一章 / 下一章） */
+var pPrev = document.getElementById('prevCh'), pNext = document.getElementById('nextCh');
+if (pPrev) { pPrev.addEventListener('click', function(){ if (CURRENT > 1) { showChapter(CURRENT - 1); } }); }
+if (pNext) { pNext.addEventListener('click', function(){ if (CURRENT < TOTAL) { showChapter(CURRENT + 1); } }); }
+
+/* 模式切换：分页 <-> 连续阅读（顶栏 + 抽屉工具区两处按钮，状态同步） */
+function syncMode(){
+  var state = document.getElementById('modeState');
+  var ts = document.querySelectorAll('.mode-toggle');
+  for (var i = 0; i < ts.length; i++) { ts[i].textContent = PAGED ? '切换为连续阅读' : '切换为分页阅读'; }
+  if (state) { state.textContent = PAGED ? '分页阅读' : '连续阅读'; }
+}
+(function(){
+  var ts = document.querySelectorAll('.mode-toggle');
+  for (var i = 0; i < ts.length; i++) {
+    (function(b){
+      b.addEventListener('click', function(){
+        PAGED = !PAGED;
+        document.body.classList.toggle('paged', PAGED);
+        if (!PAGED) {
+          var vs = document.querySelectorAll('.view');
+          for (var j = 0; j < vs.length; j++) { vs[j].classList.add('active-view'); }
+          document.body.classList.remove('view-chapter');
+        } else {
+          showChapter(CURRENT);
+        }
+        syncMode();
+      });
+    })(ts[i]);
+  }
+  syncMode();
+})();
+
+/* 键盘左右翻页（仅分页 + 章节视图） */
+document.addEventListener('keydown', function(e){
+  if (!PAGED) { return; }
+  var tag = (e.target && e.target.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA') { return; }
+  if (document.body.classList.contains('view-chapter')) {
+    if (e.key === 'ArrowLeft' && CURRENT > 1) { showChapter(CURRENT - 1); }
+    else if (e.key === 'ArrowRight' && CURRENT < TOTAL) { showChapter(CURRENT + 1); }
+  }
+});
+
+/* URL hash 变化（手动改地址 / 浏览器前进后退） */
+window.addEventListener('hashchange', function(){
+  var h = location.hash;
+  var m = h.match(/ch-(\d+)/);
+  if (m) { var n = +m[1]; if (n >= 1 && n <= TOTAL) { showChapter(n); return; } }
+  if (h === '#study') { showStudy(); return; }
+  if (h === '#cover') { showCover(); return; }
+});
+
+/* 工具箱面板：统一收纳系统功能（阅读设置 / 笔记 / 分享） */
+function openTools(){ var p = $('#toolsPanel'), m = $('#toolsMask'); if (p) p.classList.add('open'); if (m) m.classList.add('open'); }
+function closeTools(){ var p = $('#toolsPanel'), m = $('#toolsMask'); if (p) p.classList.remove('open'); if (m) m.classList.remove('open'); }
+try {
+  $('#toolsBtn').addEventListener('click', function(e){ e.stopPropagation(); var p = $('#toolsPanel'); if (p.classList.contains('open')) { closeTools(); } else { openTools(); } });
+  var tb = $('#toolsBtnBottom'); if (tb) { tb.addEventListener('click', function(e){ e.stopPropagation(); openTools(); }); }
+  $('#toolsClose').addEventListener('click', closeTools);
+  $('#toolsMask').addEventListener('click', closeTools);
+  $('#shareAnshen').addEventListener('click', function(){ shareAnshen(); closeTools(); });
+} catch (e) {}
+
+/* 初始化（每项独立容错，单点失败不影响其他功能） */
+try { refreshTocDates(); } catch (e) {}
+try { updateToday(); } catch (e) {}
+try { markReadToc(); } catch (e) {}
+try { loadShengNotes(); } catch (e) {}
+try { bindShengNotes(); } catch (e) {}
+try { $('#exportSheng').addEventListener('click', exportSheng); } catch (e) {}
+try { $('#anshenShare').addEventListener('click', shareAnshen); } catch (e) {}
+document.body.classList.add('paged');   /* 默认分页阅读 */
+try {
+  var h0 = location.hash;
+  var m0 = h0.match(/ch-(\d+)/);
+  if (m0) { var n0 = +m0[1]; if (n0 >= 1 && n0 <= TOTAL) { showChapter(n0); } else { showCover(); } }
+  else if (h0 === '#study') { showStudy(); }
+  else { showCover(); markActive(Math.max(1, Math.min(TOTAL, dayIndex()))); }
+} catch (e) { try { showCover(); } catch (e2) {} }
+
+/* URL 带章节链接打开时：高亮闪烁（跳转由原生锚点完成） */
+(function(){
+  try {
+    var m = location.hash.match(/ch-(\d+)/);
+    if (m) {
+      var n = +m[1];
+      if (n >= 1 && n <= TOTAL) {
+        var el = document.getElementById('ch-' + n);
+        if (el) { setTimeout(function(){ el.classList.add('flash'); }, 400); }
+      }
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

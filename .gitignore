@@ -1,0 +1,11 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# WorkBuddy app marker
+.wbapp_*.genie
+.workbuddy/
+
+# Build artifacts (dist/ and publish/ are generated from JSON data)
+# dist/ is the local build output; publish/ is the deploy copy
+# Both are regenerable — but we include them for convenience
