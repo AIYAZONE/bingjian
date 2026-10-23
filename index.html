@@ -167,19 +167,12 @@ footer{padding:34px 0 46px;text-align:center;color:var(--soft);font-size:12px;li
   .pager .pager-info{font-size:12px;letter-spacing:0;line-height:1.6}
   .pager .plabel{display:none}
 }
-/* 窄屏（含平板）：导航移到底部 tab 栏；顶栏改为极简当前篇上下文条，不吸顶 */
+/* 窄屏（含平板）：导航移到底部 tab 栏；顶栏直接隐藏，最大化正文可视面积 */
 @media (max-width:1023px){
   .desk-only{display:none}
   .top-actions .nav-btn{display:none}
   .bottom-nav{display:flex}
-  /* 顶栏在移动端：极简上下文条——显示当前篇名而非孤零零的品牌名 */
-  .topbar{position:static;backdrop-filter:none;border-bottom:none;height:auto;padding:8px 0 6px}
-  .topbar-inner{height:auto;min-height:36px;padding:0 16px;flex-direction:column;align-items:flex-start;gap:2px}
-  .topbar .brand{display:none}
-  .top-actions{display:none}
-  .topbar .ctx-line{display:block;font-size:13px;color:var(--ink);font-weight:600;letter-spacing:1px;line-height:1.4}
-  .topbar .ctx-line .ctx-sep{color:var(--line);margin:0 6px}
-  .topbar .ctx-line .ctx-ch{color:var(--accent)}
+  .topbar{display:none}
   /* 跳转锚点时不再为吸顶顶栏预留空间 */
   .chapter,.study{scroll-margin-top:12px}
   /* 目录抽屉：章号 / 标题 / 共读日期 两行展示，日期常显 */
