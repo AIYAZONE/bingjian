@@ -4,7 +4,7 @@
 
 《冰鉴》旧题清·曾国藩撰，共七篇，依次为神骨、刚柔、容貌、情态、须眉、声音、气色。全书以「一身精神具乎两目，一身骨相具乎面部」开篇，从静态的骨相到动态的情态，从先天的刚柔五行到后天的气色变化，构建了一套由内而外、由静而动、由本而末的观人体系。七篇虽短，义理精微，是中国传统相人术的纲领之作。
 
-**线上站点**：[zhongyong-gongdu.app.workbuddy.host](https://zhongyong-gongdu.app.workbuddy.host/)
+**线上站点**：[bingjian.aiyazone.com](https://bingjian.aiyazone.com/)
 
 ---
 
