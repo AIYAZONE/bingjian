@@ -1,11 +1,26 @@
-# OS
+# macOS
 .DS_Store
-Thumbs.db
 
-# WorkBuddy app marker
-.wbapp_*.genie
+# IDE
+.idea/
+.vscode/
+
+# WorkBuddy project data
 .workbuddy/
+.genie
 
-# Build artifacts (dist/ and publish/ are generated from JSON data)
-# dist/ is the local build output; publish/ is the deploy copy
-# Both are regenerable — but we include them for convenience
+# Data sources (build inputs, not shipped)
+chapters.json
+config.json
+content.json
+sentences.json
+study.json
+p1.json
+pinyin.json
+
+# Build output (regenerable from index.html)
+dist/
+publish/
+
+# OS junk
+Thumbs.db
